@@ -28,8 +28,10 @@ import exceptions.CambioTurnosException;
 import exceptions.JuegoNoDisponibleException;
 import exceptions.PrestamoNoPermitidoException;
 import exceptions.ReservaNoExitosaException;
+import exceptions.TorneosException;
 import exceptions.VentaNoPermitidaException;
 import sujetos.Administrador;
+import torneos.*;
 
 public class Café implements Serializable{
 
@@ -45,20 +47,26 @@ public class Café implements Serializable{
 	private ArrayList<Solicitud> solicitudes;
 	private ArrayList<Venta> historialVentas;
 	private ArrayList<UsuarioComprador> usuarios;
+	private ArrayList<Torneo> torneos;
 	private int idReservas = 1;
 	private int idSolicitud = 1;
+	private int idTorneos = 1;
 
 	
 
 	
 	
 	
+	
+
+	
+
 	public Café(int capacidad, ArrayList<Platillos> menú, ArrayList<Mesa> mesas, ArrayList<Prestamo> historialPrestamos,
 			ArrayList<Empleado> empleados, ArrayList<JuegoVenta> inventarioJuegosVenta,
 			ArrayList<JuegoPrestamo> inventarioJuegosPrestamo,
 			HashMap<Integer, ArrayList<Venta>> historialComprasUsuario, ArrayList<Reserva> reservas,
 			ArrayList<Solicitud> solicitudes, ArrayList<Venta> historialVentas, ArrayList<UsuarioComprador> usuarios,
-			int idReservas, int idSolicitud) {
+			ArrayList<Torneo> torneos, int idReservas, int idSolicitud, int idTorneos) {
 		super();
 		Capacidad = capacidad;
 		this.menú = menú;
@@ -72,8 +80,10 @@ public class Café implements Serializable{
 		this.solicitudes = solicitudes;
 		this.historialVentas = historialVentas;
 		this.usuarios = usuarios;
+		this.torneos = torneos;
 		this.idReservas = idReservas;
 		this.idSolicitud = idSolicitud;
+		this.idTorneos = idTorneos;
 	}
 
 	public int getCapacidad() {
@@ -86,6 +96,23 @@ public class Café implements Serializable{
 	
 	
 	
+	
+
+	public int getIdTorneos() {
+		return idTorneos;
+	}
+
+	public void setIdTorneos(int idTorneos) {
+		this.idTorneos = idTorneos;
+	}
+
+	public ArrayList<Torneo> getTorneos() {
+		return torneos;
+	}
+
+	public void setTorneos(ArrayList<Torneo> torneos) {
+		this.torneos = torneos;
+	}
 
 	public ArrayList<UsuarioComprador> getUsuarios() {
 		return usuarios;
@@ -546,6 +573,41 @@ public class Café implements Serializable{
 			return true;
 			
 		}
+	
+	public int contarJugadoresJuegoPrestamo(Juego j) {
+		int total = 0;
+		
+		for (JuegoPrestamo jp : inventarioJuegosPrestamo) {
+			if (jp.getInfoJuego().equals(j) && jp.isDisponible() && !jp.isDesaparecido() ) {
+				total += jp.getInfoJuego().getCantidadJugadores();
+			}
+		}
+		
+		return total;
+	}
+	
+	public Torneo crearTorneo(DayOfWeek diaSemana, int numParticipantes, Juego juegoAsociado, double tarifaEntrada, boolean esCompetitivo) {
+		
+		Torneo torneo;
+		int id = idTorneos;
+		setIdTorneos(id + 1);
+		
+		if (numParticipantes > contarJugadoresJuegoPrestamo(juegoAsociado)) {
+			throw new TorneosException("No hay la suficientes cantidad de copias del juego");
+		}
+		
+		if (esCompetitivo) {
+			
+			torneo = new Competitivo(id, diaSemana, numParticipantes, juegoAsociado, tarifaEntrada);
+		}
+		else {
+			torneo = new Amistoso(id, diaSemana, numParticipantes, juegoAsociado);
+		}
+		
+		torneos.add(torneo);
+		return torneo;
+		
+	}
 		
 	
 		public SugerirPlatillo crearSugerenciaPlatillo(Empleado sug, Platillos platillo){

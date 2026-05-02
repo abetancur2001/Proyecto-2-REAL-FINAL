@@ -35,6 +35,8 @@ public class Main {
                 new ArrayList<>(),
                 new ArrayList<>(),
                 new ArrayList<>(),
+                new ArrayList<>(),
+                0,
                 0,0
             );
 
@@ -82,7 +84,7 @@ public class Main {
                     Cliente nuevo = new Cliente(
                             nombre, edad, cedula,
                             new ArrayList<>(), 1234, nombre,
-                            new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), 0
+                            new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), 0, 0
                     );
 
                     usuarios.add(nuevo);
@@ -301,13 +303,13 @@ public class Main {
         Turno turno = new Turno(dias, LocalTime.of(0,0), LocalTime.of(23,59), null);
 
         cafe.getEmpleados().add(new Mesero("m1",25,1,new ArrayList<>(),1,"m1",
-                new ArrayList<>(),new ArrayList<>(),new ArrayList<>(),0,turno,new ArrayList<>()));
+                new ArrayList<>(),new ArrayList<>(),new ArrayList<>(),0,0,turno,new ArrayList<>()));
 
         cafe.getEmpleados().add(new Mesero("m2",26,2,new ArrayList<>(),1,"m2",
-                new ArrayList<>(),new ArrayList<>(),new ArrayList<>(),0,turno,new ArrayList<>()));
+                new ArrayList<>(),new ArrayList<>(),new ArrayList<>(),0,0,turno,new ArrayList<>()));
 
         cafe.getEmpleados().add(new Cocinero("c1",30,3,new ArrayList<>(),1,"c1",
-                new ArrayList<>(),new ArrayList<>(),new ArrayList<>(),0,turno));
+                new ArrayList<>(),new ArrayList<>(),new ArrayList<>(),0,0,turno));
 
         cafe.getMesas().add(new Mesa(false,1,new ArrayList<>(),false,2));
         cafe.getMesas().add(new Mesa(false,2,new ArrayList<>(),false,4));

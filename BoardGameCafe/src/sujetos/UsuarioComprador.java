@@ -13,16 +13,20 @@ public abstract class UsuarioComprador extends Usuario implements Serializable{
 	protected ArrayList<Prestamo> juegosPrestados;
 	protected ArrayList<String> alergenos;
 	private double puntosFidelidad;
+	private double descuentosDisponibles;
 
+
+	
 
 	public UsuarioComprador(String nombre, int edad, int cedula, ArrayList<Juego> juegosFav, int password, String login,
 			ArrayList<Venta> comprasTotales, ArrayList<Prestamo> juegosPrestados, ArrayList<String> alergenos,
-			double puntosFidelidad) {
+			double puntosFidelidad, double descuentosDisponibles) {
 		super(nombre, edad, cedula, juegosFav, password, login);
 		this.comprasTotales = comprasTotales;
 		this.juegosPrestados = juegosPrestados;
 		this.alergenos = alergenos;
 		this.puntosFidelidad = puntosFidelidad;
+		this.descuentosDisponibles = descuentosDisponibles;
 	}
 
 	public ArrayList<Venta> getComprasTotales() {
@@ -60,6 +64,16 @@ public abstract class UsuarioComprador extends Usuario implements Serializable{
 	public void agregarCompra(Venta v) {
 		comprasTotales.add(v);
 	}
+
+	public double getDescuentosDisponibles() {
+		return descuentosDisponibles;
+	}
+
+	public void setDescuentosDisponibles(double descuentosDisponibles) {
+		this.descuentosDisponibles = descuentosDisponibles;
+	}
+	
+	
 	
 	
 	

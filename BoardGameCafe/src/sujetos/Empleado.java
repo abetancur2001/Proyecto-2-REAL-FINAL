@@ -16,11 +16,13 @@ public abstract class Empleado extends UsuarioComprador implements Serializable{
 
 	
 
+	
+
 	public Empleado(String nombre, int edad, int cedula, ArrayList<Juego> juegosFav, int password, String login,
 			ArrayList<Venta> comprasTotales, ArrayList<Prestamo> juegosPrestados, ArrayList<String> alergenos,
-			int puntosFidelidad, Turno turnoAsignado) {
+			double puntosFidelidad, double descuentosDisponibles, Turno turnoAsignado) {
 		super(nombre, edad, cedula, juegosFav, password, login, comprasTotales, juegosPrestados, alergenos,
-				puntosFidelidad);
+				puntosFidelidad, descuentosDisponibles);
 		this.turnoAsignado = turnoAsignado;
 	}
 
