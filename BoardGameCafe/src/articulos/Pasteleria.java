@@ -7,7 +7,7 @@ import sujetos.Cocinero;
 
 public class Pasteleria extends Platillos implements Serializable{
 
-	public Pasteleria(int precio, String nombrePlatillo, ArrayList<String> alergenos, Cocinero preparadoPor) {
+	public Pasteleria(int precio, String nombrePlatillo, ArrayList<Alergenos> alergenos) {
 		super(precio, nombrePlatillo, alergenos);
 	}
 

@@ -7,9 +7,9 @@ import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
-import articulos.JuegoPrestamo;
-import articulos.JuegoVenta;
-import articulos.Platillos;
+
+import articulos.*;
+import exceptions.*;
 import sujetos.Cliente;
 import sujetos.Cocinero;
 import sujetos.Empleado;
@@ -18,18 +18,10 @@ import sujetos.Persona;
 import sujetos.UsuarioComprador;
 import modelo.Reserva;
 import modelo.Venta;
-import articulos.Item;
-import articulos.Juego;
 import modelo.Prestamo;
-import articulos.RestriccionEdad;
+
 import java.time.LocalDate;
-import exceptions.CapacidadExcedidaException;
-import exceptions.CambioTurnosException;
-import exceptions.JuegoNoDisponibleException;
-import exceptions.PrestamoNoPermitidoException;
-import exceptions.ReservaNoExitosaException;
-import exceptions.TorneosException;
-import exceptions.VentaNoPermitidaException;
+
 import sujetos.Administrador;
 import torneos.*;
 
@@ -47,27 +39,17 @@ public class Café implements Serializable{
 	private ArrayList<Solicitud> solicitudes;
 	private ArrayList<Venta> historialVentas;
 	private ArrayList<UsuarioComprador> usuarios;
+	private ArrayList<Cliente> clientes;
 	private ArrayList<Torneo> torneos;
+	private HashMap<String, UsuarioComprador> mapaClientes;
+	private HashMap<String, Empleado> mapaEmpleados;
+	private ArrayList<Juego> catalogoJuegos;
+	private Administrador admin;
 	private int idReservas = 1;
 	private int idSolicitud = 1;
 	private int idTorneos = 1;
 
-	
-
-	
-	
-	
-	
-
-	
-
-	public Café(int capacidad, ArrayList<Platillos> menú, ArrayList<Mesa> mesas, ArrayList<Prestamo> historialPrestamos,
-			ArrayList<Empleado> empleados, ArrayList<JuegoVenta> inventarioJuegosVenta,
-			ArrayList<JuegoPrestamo> inventarioJuegosPrestamo,
-			HashMap<Integer, ArrayList<Venta>> historialComprasUsuario, ArrayList<Reserva> reservas,
-			ArrayList<Solicitud> solicitudes, ArrayList<Venta> historialVentas, ArrayList<UsuarioComprador> usuarios,
-			ArrayList<Torneo> torneos, int idReservas, int idSolicitud, int idTorneos) {
-		super();
+	public Café(int capacidad, ArrayList<Platillos> menú, ArrayList<Mesa> mesas, ArrayList<Prestamo> historialPrestamos, ArrayList<Empleado> empleados, ArrayList<JuegoVenta> inventarioJuegosVenta, ArrayList<JuegoPrestamo> inventarioJuegosPrestamo, HashMap<Integer, ArrayList<Venta>> historialComprasUsuario, ArrayList<Reserva> reservas, ArrayList<Solicitud> solicitudes, ArrayList<Venta> historialVentas, ArrayList<UsuarioComprador> usuarios, ArrayList<Cliente> clientes, ArrayList<Torneo> torneos, HashMap<String, UsuarioComprador> mapaClientes, HashMap<String, Empleado> mapaEmpleados, ArrayList<Juego> catalogoJuegos, Administrador admin, int idReservas, int idSolicitud, int idTorneos) {
 		Capacidad = capacidad;
 		this.menú = menú;
 		this.mesas = mesas;
@@ -80,7 +62,12 @@ public class Café implements Serializable{
 		this.solicitudes = solicitudes;
 		this.historialVentas = historialVentas;
 		this.usuarios = usuarios;
+		this.clientes = clientes;
 		this.torneos = torneos;
+		this.mapaClientes = mapaClientes;
+		this.mapaEmpleados = mapaEmpleados;
+		this.catalogoJuegos = catalogoJuegos;
+		this.admin = admin;
 		this.idReservas = idReservas;
 		this.idSolicitud = idSolicitud;
 		this.idTorneos = idTorneos;
@@ -93,10 +80,46 @@ public class Café implements Serializable{
 	public void setCapacidad(int capacidad) {
 		Capacidad = capacidad;
 	}
-	
-	
-	
-	
+
+	public ArrayList<Cliente> getClientes() {
+		return clientes;
+	}
+
+	public void setClientes(ArrayList<Cliente> clientes) {
+		this.clientes = clientes;
+	}
+
+	public ArrayList<Juego> getCatalogoJuegos() {
+		return catalogoJuegos;
+	}
+
+	public void setCatalogoJuegos(ArrayList<Juego> catalogoJuegos) {
+		this.catalogoJuegos = catalogoJuegos;
+	}
+
+	public HashMap<String, UsuarioComprador> getMapaClientes() {
+		return mapaClientes;
+	}
+
+	public void setMapaClientes(HashMap<String, UsuarioComprador> mapaClientes) {
+		this.mapaClientes = mapaClientes;
+	}
+
+	public HashMap<String, Empleado> getMapaEmpleados() {
+		return mapaEmpleados;
+	}
+
+	public void setMapaEmpleados(HashMap<String, Empleado> mapaEmpleados) {
+		this.mapaEmpleados = mapaEmpleados;
+	}
+
+	public Administrador getAdmin() {
+		return admin;
+	}
+
+	public void setAdmin(Administrador admin) {
+		this.admin = admin;
+	}
 
 	public int getIdTorneos() {
 		return idTorneos;
@@ -402,8 +425,9 @@ public class Café implements Serializable{
 					"Venta no permitida, se esta tratando de comprar una bebida caliente y un juego de acción");
 		}
 
-		if (ventaAux.hayAlergenoEnVenta(mesa)) {
-			System.out.println("Advertencia: hay una persona en la mesa que es alérgica a un platillo pedido");
+		if (ventaAux.hayAlergenoEnVenta(mesa) != null) {
+
+			throw new VentaNoPermitidaException("ADVERTANCIA: hay una persona alergica en la mesa a "+ ventaAux.hayAlergenoEnVenta(mesa));
 
 		}
 
@@ -639,6 +663,389 @@ public class Café implements Serializable{
 			solicitudes.add(it);
 			return it;
 			
+		}
+
+	public void revisarJuegos(){
+		for (Prestamo p:getHistorialPrestamos()) {
+			System.out.println(
+					p.getJuegoAPrestar().getInfoJuego().getNombre() + "\n"
+							+ "Disponible: " + p.getJuegoAPrestar().isDisponible() + "\n"
+							+ "Desaparecido: "+ p.getJuegoAPrestar().isDesaparecido() + "\n"
+							+ "Veces prestado: "+ p.getJuegoAPrestar().getVecesPrestado() + "\n"
+							+ "Fecha Inicial Prestamo: "+ p.getFechaInicioPrestamo() + "\n"
+							+ "Prestado a: " + p.getPrestadoA().getNombre()
+			);
+		}
+	}
+
+	public void añadirPlatillo(Platillos p) {
+		getMenú().add(p);
+	}
+
+	public void añadirJuegoPrestamo (JuegoPrestamo jp) {
+		getInventarioJuegosPrestamo().add(jp);
+	}
+
+	public void añadirJuegoVenta (JuegoVenta jv) {
+		getInventarioJuegosVenta().add(jv);
+	}
+
+	public void añaidrJuego(Juego j){getCatalogoJuegos().add(j); }
+
+	public void mostrarInventarioJuegosPrestamo(){
+
+		int i = 0;
+
+		if(getInventarioJuegosPrestamo().isEmpty()){
+			throw new MostrarException("No hay Juegos en el inventario de Prestamo");
+		}
+
+		for(JuegoPrestamo j : inventarioJuegosPrestamo){
+			System.out.println("Opcion: "+ i + "\n"+
+					"Nombre: "+ j.getInfoJuego().getNombre() + "\n"+
+					"Año: "+ j.getInfoJuego().getNombre() + "\n"+
+					"Empresa: " + j.getInfoJuego().getEmpresa() + "\n"+
+					"Cantidad de Jugadores: " + j.getInfoJuego().getCantidadJugadores() + "\n"+
+					"¿Es Dificil?: "+ j.getInfoJuego().isEsDificil() + "\n"+
+					"Es Apto para: " + j.getInfoJuego().getApto() + "\n"+
+					"Tipo: " + j.getInfoJuego().getTipo() + "\n"+
+					"¿Está Disponible?: " + j.isDisponible() +"\n"+
+					"¿Está Desaprecido?: " + j.isDesaparecido() +"\n"+
+					"Estado: "+ j.getEstado() +"\n"+
+					"Veces Prestado: " + j.getVecesPrestado()+"\n"
+			);
+
+			i += 1;
+		}
+
+	}
+
+	public void mostrarInventarioJuegosVenta(){
+		int i =0;
+		if (getInventarioJuegosVenta().isEmpty()){
+			throw new MostrarException("No hay Juegos en el inventario de Venta");
+		}
+
+		for(JuegoVenta j : inventarioJuegosVenta){
+			System.out.println("Opcion: "+ i + "\n"+
+					"Nombre: "+ j.getInfoJuegoVenta().getNombre() + "\n"+
+					"Año: "+ j.getInfoJuegoVenta().getNombre() + "\n"+
+					"Empresa: " + j.getInfoJuegoVenta().getEmpresa() + "\n"+
+					"Cantidad de Jugadores: " + j.getInfoJuegoVenta().getCantidadJugadores() + "\n"+
+					"¿Es Dificil?: "+ j.getInfoJuegoVenta().isEsDificil() + "\n"+
+					"Es Apto para: " + j.getInfoJuegoVenta().getApto() + "\n"+
+					"Tipo: " + j.getInfoJuegoVenta().getTipo() + "\n"+
+					"Precio: " + j.getPrecio() +"\n"+
+					"Stock: " + j.getStock() +"\n"
+			);
+
+			i += 1;
+		}
+	}
+
+	public void mostrarCatalogoJuegos(){
+		int i = 0;
+
+		if(getCatalogoJuegos().isEmpty()){
+			throw new MostrarException("No hay Juegos en el catalogo");
+		}
+
+		for(Juego j : catalogoJuegos){
+			System.out.println("Opcion: "+ i + "\n"+
+					"Nombre: "+ j.getNombre() + "\n"+
+					"Año: "+ j.getNombre() + "\n"+
+					"Empresa: " + j.getEmpresa() + "\n"+
+					"Cantidad de Jugadores: " + j.getCantidadJugadores() + "\n"+
+					"¿Es Dificil?: "+ j.isEsDificil() + "\n"+
+					"Es Apto para: " + j.getApto() + "\n"+
+					"Tipo: " + j.getTipo() + "\n"
+			);
+
+			i += 1;
+		}
+	}
+
+	public void moverVentaAPrestamo (JuegoVenta jv) {
+
+		boolean bandera = false;
+
+		for (JuegoVenta jve :getInventarioJuegosVenta()) {
+			if(jve.equals(jv)) {
+				bandera = true;
+			}
+		}
+
+		if(bandera) {
+
+			if(jv.getStock() == 0){
+				getInventarioJuegosVenta().remove(jv);
+			}
+			else if(jv.getStock() != 0){
+				jv.setStock(jv.getStock()-1);
+			}
+
+			JuegoPrestamo jp = new JuegoPrestamo(true, false, EstadoJuego.NUEVO, jv.getInfoJuegoVenta(), 0);
+			getInventarioJuegosPrestamo().add(jp);
+		}
+		else {
+			throw new JuegoNoEncontradoException("Juego no encontrado en el inventario de juegos para la venta");
+		}
+
+	}
+
+	public void repararJuegoPrestamo (JuegoPrestamo jp) {
+		JuegoVenta juegoReemplazante = null;
+		if(getInventarioJuegosPrestamo().contains(jp) && (jp.getEstado() == EstadoJuego.DANADO || jp.getEstado() == EstadoJuego.INCOMPLETO || jp.getEstado() == EstadoJuego.DESGASTADO)) {
+			for(JuegoVenta jv :getInventarioJuegosVenta()) {
+				if(jv.getInfoJuegoVenta().equals(jp.getInfoJuego())) {
+					juegoReemplazante = jv;
+					break;
+				}
+			}
+
+			if (juegoReemplazante == null) {
+				throw new JuegoNoEncontradoException("Juego reemplazante no encontrado");
+			}
+
+			if(juegoReemplazante.getStock() == 0){
+				getInventarioJuegosVenta().remove(juegoReemplazante);
+			}
+			else if(juegoReemplazante.getStock() != 0){
+				juegoReemplazante.setStock(juegoReemplazante.getStock() - 1);
+			}
+
+			jp.setEstado(EstadoJuego.NUEVO);
+			jp.setDisponible(true);
+			jp.setDesaparecido(false);
+
+		}
+	}
+
+	public void revisarVentasDia (LocalDate fecha) {
+
+		double total = 0;
+		double subTotalJuegos = 0;
+		double impuestosJuegos = 0;
+		double subTotalPlatillos = 0;
+		double impuestoPlatillos = 0;
+		double propinas = 0;
+
+		for(Venta v : getHistorialVentas()) {
+			if (v.getFechaVenta().equals(fecha)) {
+				total += v.getTotal();
+				propinas += v.getPropina();
+				for (Item i : v.getItems()) {
+					Producto p = i.getProductoAsociado();
+					if( p instanceof JuegoVenta) {
+						JuegoVenta jv = (JuegoVenta) p;
+						subTotalJuegos += i.getCantidad() * i.getProductoAsociado().getPrecio();
+						impuestosJuegos += (i.getCantidad() * i.getProductoAsociado().getPrecio()) * jv.getImpuestoJuego();
+					}
+					else if (p instanceof Platillos) {
+						Platillos pla = (Platillos) p;
+						subTotalPlatillos += i.getCantidad() * i.getProductoAsociado().getPrecio();
+						impuestoPlatillos += (i.getCantidad() * i.getProductoAsociado().getPrecio()) * pla.getImpuestoPlatillo();
+
+					}
+				}
+			}
+		}
+
+		System.out.println(
+				"Dia: "+ fecha + "\n"
+						+ "JUEGOS" + "\n"
+						+ "Total Juegos: " + subTotalJuegos + "\n"
+						+ "Impuestos Juegos: " + impuestosJuegos + "\n\n"
+						+ "PLATILLOS" + "\n"
+						+ "Total Platillos: " +subTotalPlatillos + "\n"
+						+ "Impuestos Platillos: " + impuestoPlatillos + "\n\n"
+
+						+ "Propinas: " + propinas + "\n"
+						+ "Total: " + total + "\n"
+
+		);
+
+	}
+
+	public void revisarVentasMes (LocalDate fecha) {
+
+		double total = 0;
+		double subTotalJuegos = 0;
+		double impuestosJuegos = 0;
+		double subTotalPlatillos = 0;
+		double impuestoPlatillos = 0;
+		double propinas = 0;
+
+
+		for(Venta v : getHistorialVentas()) {
+			if (v.getFechaVenta().getMonthValue() == fecha.getMonthValue() && v.getFechaVenta().getYear() == fecha.getYear()) {
+				total += v.getTotal();
+				propinas += v.getPropina();
+				for (Item i : v.getItems()) {
+					Producto p = i.getProductoAsociado();
+					if( p instanceof JuegoVenta) {
+						JuegoVenta jv = (JuegoVenta) p;
+						subTotalJuegos += i.getCantidad() * i.getProductoAsociado().getPrecio();
+						impuestosJuegos += (i.getCantidad() * i.getProductoAsociado().getPrecio()) * jv.getImpuestoJuego();
+					}
+					else if (p instanceof Platillos) {
+						Platillos pla = (Platillos) p;
+						subTotalPlatillos += i.getCantidad() * i.getProductoAsociado().getPrecio();
+						impuestoPlatillos += (i.getCantidad() * i.getProductoAsociado().getPrecio()) * pla.getImpuestoPlatillo();
+
+					}
+				}
+			}
+		}
+
+		System.out.println(
+				"Mes: "+ fecha.getMonth() + "\n"
+						+ "JUEGOS" + "\n"
+						+ "Total Juegos: " + subTotalJuegos + "\n"
+						+ "Impuestos Juegos: " + impuestosJuegos + "\n\n"
+						+ "PLATILLOS" + "\n"
+						+ "Total Platillos: " +subTotalPlatillos + "\n"
+						+ "Impuestos Platillos: " + impuestoPlatillos + "\n\n"
+
+						+ "Propinas: " + propinas + "\n"
+						+ "Total: " + total + "\n"
+
+		);
+
+	}
+
+	public void revisarVentasSemana (LocalDate fecha) {
+
+		double total = 0;
+		double subTotalJuegos = 0;
+		double impuestosJuegos = 0;
+		double subTotalPlatillos = 0;
+		double impuestoPlatillos = 0;
+		double propinas = 0;
+
+		for(Venta v : getHistorialVentas()) {
+			if (( v.getFechaVenta().equals(fecha) || v.getFechaVenta().isAfter(fecha)) && (v.getFechaVenta().isBefore(fecha.plusDays(6)) || v.getFechaVenta().equals(fecha.plusDays(6)))) {
+				total += v.getTotal();
+				propinas += v.getPropina();
+				for (Item i : v.getItems()) {
+					Producto p = i.getProductoAsociado();
+					if( p instanceof JuegoVenta) {
+						JuegoVenta jv = (JuegoVenta) p;
+						subTotalJuegos += i.getCantidad() * i.getProductoAsociado().getPrecio();
+						impuestosJuegos += (i.getCantidad() * i.getProductoAsociado().getPrecio()) * jv.getImpuestoJuego();
+					}
+					else if (p instanceof Platillos) {
+						Platillos pla = (Platillos) p;
+						subTotalPlatillos += i.getCantidad() * i.getProductoAsociado().getPrecio();
+						impuestoPlatillos += (i.getCantidad() * i.getProductoAsociado().getPrecio()) * pla.getImpuestoPlatillo();
+
+					}
+				}
+			}
+		}
+
+		System.out.println(
+				"Semana: "+ fecha +" a " + fecha.plusDays(6) + "\n"
+						+ "JUEGOS" + "\n"
+						+ "Total Juegos: " + subTotalJuegos + "\n"
+						+ "Impuestos Juegos: " + impuestosJuegos + "\n\n"
+						+ "PLATILLOS" + "\n"
+						+ "Total Platillos: " +subTotalPlatillos + "\n"
+						+ "Impuestos Platillos: " + impuestoPlatillos + "\n\n"
+
+						+ "Propinas: " + propinas + "\n"
+						+ "Total: " + total + "\n"
+
+		);
+
+	}
+
+	public void mostrarComprasXUsuario(){
+
+
+
+	}
+
+		public void addEmpleado(Empleado emp) {
+
+			if(empleados.contains(emp)) {
+				throw new AddSujetoException("El empleado ya existe");
+			}
+			else{
+				empleados.add(emp);
+			}
+
+			if (mapaEmpleados.containsKey(emp.getLogin())) {
+				throw new AddSujetoException("El empleado ya existe");
+			}
+			else{
+				mapaEmpleados.put(emp.getLogin(), emp);
+			}
+
+		}
+
+		public void addCliente(Cliente c) {
+
+			if (clientes.contains(c)) {
+				throw new AddSujetoException("El cliente ya existe");
+			} else {
+				clientes.add(c);
+			}
+
+			if (mapaClientes.containsKey(c.getLogin())) {
+				throw new AddSujetoException("El cliente ya existe");
+			} else {
+				mapaClientes.put(c.getLogin(), c);
+			}
+
+		}
+
+		public Empleado autenticarEmpleado(String login, int pass){
+
+			if (mapaEmpleados.containsKey(login)){
+				Empleado e = (Empleado) mapaEmpleados.get(login);
+				if (e.getPassword() == pass){
+					return e;
+				}
+			}
+
+			return null;
+		}
+
+		public Cliente autenticarCliente(String login, int pass){
+
+			if (mapaClientes.containsKey(login)){
+				Cliente c = (Cliente) mapaClientes.get(login);
+				if (c.getPassword() == pass){
+					return c;
+				}
+			}
+
+			return null;
+
+		}
+
+		public Administrador autenticarAdmin(String login, int pass){
+
+			if (admin.getLogin().equals(login) && admin.getPassword() == pass ){
+				return admin;
+			}
+
+			return null;
+		}
+
+		public void inicializarDatos(){
+			if(admin == null){
+				admin = new Administrador("Andres", 34, 123456, new ArrayList<Juego>(), 4545, "adminPro" );
+			}
+
+			if (mesas.size() == 0 ){
+				Mesa mesa1 = new Mesa(false, 1, new ArrayList<Cliente>(), false, 4);
+				Mesa mesa2 = new Mesa(false, 2, new ArrayList<Cliente>(), false, 4);
+				mesas.add(mesa1);
+				mesas.add(mesa2);
+
+			}
 		}
 
 	}

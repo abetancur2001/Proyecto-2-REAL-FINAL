@@ -2,6 +2,8 @@ package sujetos;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+
+import articulos.Alergenos;
 import articulos.Juego;
 import modelo.Prestamo;
 import modelo.Venta;
@@ -11,7 +13,7 @@ public abstract class UsuarioComprador extends Usuario implements Serializable{
 
 	protected ArrayList<Venta> comprasTotales;
 	protected ArrayList<Prestamo> juegosPrestados;
-	protected ArrayList<String> alergenos;
+	protected ArrayList<Alergenos> alergenos;
 	private double puntosFidelidad;
 	private double descuentosDisponibles;
 
@@ -19,7 +21,7 @@ public abstract class UsuarioComprador extends Usuario implements Serializable{
 	
 
 	public UsuarioComprador(String nombre, int edad, int cedula, ArrayList<Juego> juegosFav, int password, String login,
-			ArrayList<Venta> comprasTotales, ArrayList<Prestamo> juegosPrestados, ArrayList<String> alergenos,
+			ArrayList<Venta> comprasTotales, ArrayList<Prestamo> juegosPrestados, ArrayList<Alergenos> alergenos,
 			double puntosFidelidad, double descuentosDisponibles) {
 		super(nombre, edad, cedula, juegosFav, password, login);
 		this.comprasTotales = comprasTotales;
@@ -45,11 +47,11 @@ public abstract class UsuarioComprador extends Usuario implements Serializable{
 		this.juegosPrestados = juegosPrestados;
 	}
 
-	public ArrayList<String> getAlergenos() {
+	public ArrayList<Alergenos> getAlergenos() {
 		return alergenos;
 	}
 
-	public void setAlergenos(ArrayList<String> alergenos) {
+	public void setAlergenos(ArrayList<Alergenos> alergenos) {
 		this.alergenos = alergenos;
 	}
 

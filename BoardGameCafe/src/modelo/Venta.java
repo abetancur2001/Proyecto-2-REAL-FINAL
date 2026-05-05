@@ -2,12 +2,8 @@ package modelo;
 
 import java.util.ArrayList;
 
-import articulos.Bebida;
-import articulos.Item;
-import articulos.JuegoVenta;
-import articulos.Platillos;
-import articulos.Producto;
-import articulos.TiposJuegos;
+import articulos.*;
+import exceptions.VentaNoPermitidaException;
 import sujetos.Empleado;
 import sujetos.UsuarioComprador;
 
@@ -107,24 +103,23 @@ public class Venta implements Serializable{
 		return false;
 	}
 
-	public boolean hayAlergenoEnVenta(Mesa mesa) {
+	public Alergenos hayAlergenoEnVenta(Mesa mesa) {
 		for (UsuarioComprador us : mesa.getPersonasSentadas()) {
-			for (String a : us.getAlergenos()) {
+			for (Alergenos a : us.getAlergenos()) {
 				for (Item i : items) {
 					Producto p = i.getProductoAsociado();
 					if (p instanceof Platillos) {
 						Platillos platillo = (Platillos) p;
 						if (platillo.getAlergenos().contains(a)) {
-							return true;
+							return a;
 						}
-
 					}
 
 				}
 			}
 		}
 
-		return false;
+		return null;
 	}
 
 	public boolean hayCalienteVsAccion(Mesa mesa) {

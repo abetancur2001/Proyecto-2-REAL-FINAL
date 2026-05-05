@@ -24,7 +24,7 @@ public class Bebida extends Platillos implements Serializable{
 	public void setEsCaliente(Boolean esCaliente) {
 		this.esCaliente = esCaliente;
 	}
-	public Bebida(int precio, String nombrePlatillo, ArrayList<String> alergenos, Cocinero preparadoPor, Boolean alcoholica, Boolean esCaliente) {
+	public Bebida(int precio, String nombrePlatillo, ArrayList<Alergenos> alergenos, Boolean alcoholica, Boolean esCaliente) {
 		super(precio, nombrePlatillo, alergenos);
 		this.alcoholica = alcoholica;
 		this.esCaliente = esCaliente;

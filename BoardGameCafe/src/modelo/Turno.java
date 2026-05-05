@@ -11,14 +11,12 @@ public class Turno implements Serializable{
 	private ArrayList<DayOfWeek> dias;
 	private LocalTime horaEntrada;
 	private LocalTime horaSalida;
-	private Empleado solicitante;
 	
-	public Turno(ArrayList<DayOfWeek> dias, LocalTime horaEntrada, LocalTime horaSalida, Empleado solicitante) {
+	public Turno(ArrayList<DayOfWeek> dias, LocalTime horaEntrada, LocalTime horaSalida) {
 		super();
 		this.dias = dias;
 		this.horaEntrada = horaEntrada;
 		this.horaSalida = horaSalida;
-		this.solicitante = solicitante;
 	}
 
 	public ArrayList<DayOfWeek> getDias() {
@@ -45,14 +43,7 @@ public class Turno implements Serializable{
 		this.horaSalida = horaSalida;
 	}
 
-	public Empleado getSolicitante() {
-		return solicitante;
-	}
 
-	public void setSolicitante(Empleado solicitante) {
-		this.solicitante = solicitante;
-	}
-	
 	
 	
 	
