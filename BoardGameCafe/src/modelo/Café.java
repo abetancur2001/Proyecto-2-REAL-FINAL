@@ -960,9 +960,9 @@ public class Café implements Serializable{
 
 	}
 
-	public void mostrarComprasXUsuario(){
+	public void mostrarComprasXUsuario(int cedula){
 
-
+		getHistorialComprasUsuario().get(cedula);
 
 	}
 
