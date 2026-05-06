@@ -1,6 +1,7 @@
 package main;
 
 import articulos.*;
+import exceptions.AutenticacionException;
 import exceptions.CapacidadExcedidaException;
 import exceptions.JuegoNoEncontradoException;
 import exceptions.MostrarException;
@@ -108,7 +109,7 @@ public class AdminConsola {
 
         }
         else{
-            System.out.println("Acceso Denegado. Vuelva a Ingresar sus datos");
+            throw new AutenticacionException("Acceso Denegado. Vuelva a Ingresar sus datos");
         }
 
     }
