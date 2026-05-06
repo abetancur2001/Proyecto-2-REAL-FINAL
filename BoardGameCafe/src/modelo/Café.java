@@ -39,12 +39,23 @@ public class Café implements Serializable{
 	private HashMap<String, Empleado> mapaEmpleados;
 	private ArrayList<Juego> catalogoJuegos;
 	private Administrador admin;
+	private HashMap<Integer, ArrayList<Reserva>> mapaReservas;
 	private int idReservas = 1;
 	private int idSolicitud = 1;
 	private int idTorneos = 1;
 	private int idMesa = 9;
+	private int idPrestamo = 0;
 
-	public Café(int capacidad, ArrayList<Platillos> menú, ArrayList<Mesa> mesas, ArrayList<Prestamo> historialPrestamos, ArrayList<Empleado> empleados, ArrayList<JuegoVenta> inventarioJuegosVenta, ArrayList<JuegoPrestamo> inventarioJuegosPrestamo, HashMap<Integer, ArrayList<Venta>> historialComprasUsuario, ArrayList<Reserva> reservas, ArrayList<Solicitud> solicitudes, ArrayList<Venta> historialVentas, ArrayList<UsuarioComprador> usuarios, ArrayList<Cliente> clientes, ArrayList<Torneo> torneos, HashMap<String, UsuarioComprador> mapaClientes, HashMap<String, Empleado> mapaEmpleados, ArrayList<Juego> catalogoJuegos, Administrador admin, int idReservas, int idSolicitud, int idTorneos, int idMesa) {
+	public int getIdPrestamo() {
+		setIdPrestamo(idPrestamo + 1);
+		return idPrestamo;
+	}
+
+	public void setIdPrestamo(int idPrestamo) {
+		this.idPrestamo = idPrestamo;
+	}
+
+	public Café(int capacidad, ArrayList<Platillos> menú, ArrayList<Mesa> mesas, ArrayList<Prestamo> historialPrestamos, ArrayList<Empleado> empleados, ArrayList<JuegoVenta> inventarioJuegosVenta, ArrayList<JuegoPrestamo> inventarioJuegosPrestamo, HashMap<Integer, ArrayList<Venta>> historialComprasUsuario, ArrayList<Reserva> reservas, ArrayList<Solicitud> solicitudes, ArrayList<Venta> historialVentas, ArrayList<UsuarioComprador> usuarios, ArrayList<Cliente> clientes, ArrayList<Torneo> torneos, HashMap<String, UsuarioComprador> mapaClientes, HashMap<String, Empleado> mapaEmpleados, ArrayList<Juego> catalogoJuegos, Administrador admin, HashMap<Integer, ArrayList<Reserva>> mapaReservas, int idReservas, int idSolicitud, int idTorneos, int idMesa, int idPrestamo) {
 		Capacidad = capacidad;
 		this.menú = menú;
 		this.mesas = mesas;
@@ -63,10 +74,12 @@ public class Café implements Serializable{
 		this.mapaEmpleados = mapaEmpleados;
 		this.catalogoJuegos = catalogoJuegos;
 		this.admin = admin;
+		this.mapaReservas = mapaReservas;
 		this.idReservas = idReservas;
 		this.idSolicitud = idSolicitud;
 		this.idTorneos = idTorneos;
 		this.idMesa = idMesa;
+		this.idPrestamo = idPrestamo;
 	}
 
 	public int getCapacidad() {
@@ -85,6 +98,16 @@ public class Café implements Serializable{
 
 		setIdMesa(idMesa + 1);
 		return idMesa;
+	}
+
+
+
+	public HashMap<Integer, ArrayList<Reserva>> getMapaReservas() {
+		return mapaReservas;
+	}
+
+	public void setMapaReservas(HashMap<Integer, ArrayList<Reserva>> mapaReservas) {
+		this.mapaReservas = mapaReservas;
 	}
 
 	public void setIdMesa(int idMesa) {
@@ -394,6 +417,7 @@ public class Café implements Serializable{
 				prestadoA.getJuegosPrestados().add(prestamo);
 				jp.setDisponible(false);
 				historialPrestamos.add(prestamo);
+
 				return prestamo;
 			}
 		}
@@ -488,11 +512,13 @@ public class Café implements Serializable{
 		if (mesaDis == null) {
 			throw new ReservaNoExitosaException("Reserva no Exitosa, no hay mesa disponible");
 		}
-		
+
 		int id = idReservas;
 		setIdReservas(idReservas + 1);
 		mesaDis.setOcupada(true);
 		res = new Reserva(id, fechaReserva, mesaDis, reservadoPor, numPersonas,horaReserva);
+		mapaReservas.put(reservadoPor.getCedula(), new ArrayList<>());
+		mapaReservas.get(reservadoPor.getCedula()).add(res);
 		reservas.add(res);
 		
 		return res;

@@ -14,7 +14,7 @@ public class Prestamo implements Serializable{
 	private LocalDate fechaFinPrestamo;
 	private JuegoPrestamo juegoAPrestar;
 	private UsuarioComprador prestadoA;
-	private int idPrestamo;
+	private int idPrestamo = 0;
 	
 	public LocalDate getFechaInicioPrestamo() {
 		return fechaInicioPrestamo;
@@ -37,7 +37,11 @@ public class Prestamo implements Serializable{
 	public int getIdPrestamo() {
 		return idPrestamo;
 	}
-	
+
+	public void setIdPrestamo(int idPrestamo) {
+		this.idPrestamo = idPrestamo;
+	}
+
 	public Prestamo(LocalDate fechaInicioPrestamo, LocalDate fechaFinPrestamo, JuegoPrestamo juegoSolicitado, UsuarioComprador prestadoA,
 			int idPrestamo) {
 		super();

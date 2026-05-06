@@ -4,11 +4,9 @@ import articulos.Alergenos;
 import articulos.Juego;
 import com.sun.security.jgss.AuthorizationDataEntry;
 import exceptions.AutenticacionException;
+import exceptions.CapacidadExcedidaException;
 import exceptions.MostrarException;
-import modelo.Café;
-import modelo.Prestamo;
-import modelo.Reserva;
-import modelo.Venta;
+import modelo.*;
 import persistencia.GestorPersistencia;
 import sujetos.Cliente;
 
@@ -34,7 +32,7 @@ public class ClienteConsola {
             System.out.println("Datos cargados");
         } catch (Exception e){
             System.out.println("No se encontró cafe, creando uno nuevo...");
-            cafe = new Café(50, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new HashMap<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new HashMap<>(), new HashMap<>(), new ArrayList<Juego>(), null, 1, 1,1, 9);
+            cafe = new Café(50, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new HashMap<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new HashMap<>(), new HashMap<>(), new ArrayList<Juego>(), null, new HashMap<>(), 1,1, 9, 1, 0);
             cafe.inicializarDatos();
         }
 
@@ -73,7 +71,7 @@ public class ClienteConsola {
                         hacerReserva();
                         break;
                     case 2:
-                        //solicitarPrestamo();
+                        solicitarPrestamo();
                         break;
                     case 3:
                         //comprarProducto();
@@ -212,6 +210,7 @@ public class ClienteConsola {
     private static void hacerReserva(){
 
         LocalDate fechaRes = null;
+        Reserva res = null;
         System.out.println("----- HACER RESERVA-----");
 
         System.out.println("Ingrese el Dia de la Reserva (1-31): ");
@@ -234,13 +233,77 @@ public class ClienteConsola {
         int hora = sc.nextInt();
         System.out.println("Ingrese los minutos de la hora de la Reserva (mm): ");
         int min = sc.nextInt();
+        sc.nextLine();
 
         LocalTime horaRes = LocalTime.of(hora, min);
 
-        Reserva res = cafe.crearReserva(fechaRes, cliente, cant, horaRes);
+        try {
+            res = cafe.crearReserva(fechaRes, cliente, cant, horaRes);
+        }catch (CapacidadExcedidaException e){
+            System.out.println("No hay capacidad para la reserva");
+            return;
+        }
 
 
+        int i = 1;
+
+        while (i < cant + 1){
+            System.out.println("Ingrese el nombre del acompañante " + i + " : ");
+            String nombreA = sc.nextLine();
+            System.out.println("Ingrese la edad del acompañante " + i + " : ");
+            int edadA = sc.nextInt();
+            System.out.println("Ingrese el número de cedula del acompañante " + i + " : ");
+            int cedulaA = sc.nextInt();
+            Cliente clin = new Cliente(nombreA, edadA, cedulaA, null, 0, null, null, null, null, 0.0, 0.0);
+            res.getMesaReserva().getPersonasSentadas().add(clin);
+            i += 1;
+        }
 
     }
+
+    private static void solicitarPrestamo(){
+        System.out.println("----- SOLICITAR PRESTAMO -----");
+
+        boolean dispo = false;
+        Mesa m = null;
+
+        if(cafe.getMapaReservas().get(cliente.getCedula()).size() > 0){
+            for(Reserva res : cafe.getMapaReservas().get(cliente.getCedula())){
+                if(res.getFechaReserva().isEqual(LocalDate.now())){
+                    dispo = true;
+                    m = res.getMesaReserva();
+                    break;
+                }
+            }
+
+        }
+
+        if(!dispo){
+            throw new MostrarException("El cliente no tiene reservas activas para el dia de hoy");
+        }
+
+        cafe.mostrarCatalogoJuegos();
+        System.out.println("Selecione un Juego del catalogo: ");
+        int opcionJ = sc.nextInt();
+        System.out.println("Ingrese el dia de la entrega del juego: ");
+        int diaEnt = sc.nextInt();
+        System.out.println("Ingrese el mes de la entrega del juego: ");
+        int mesEnt = sc.nextInt();
+        System.out.println("Ingrese el anio de la entrega del juego: ");
+        int anioEnt = sc.nextInt();
+
+        LocalDate fechaEnt = null;
+        try{
+            fechaEnt = LocalDate.of(anioEnt, mesEnt, diaEnt);
+        }catch(DateTimeException e){
+            System.out.println("Fecha invalida");
+            return;
+        }
+
+        cafe.crearPrestamo(LocalDate.now(), fechaEnt, cafe.getCatalogoJuegos().get(opcionJ), cliente, cafe.getIdPrestamo(), m);
+
+    }
+
+
 
 }
