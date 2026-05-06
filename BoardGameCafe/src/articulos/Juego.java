@@ -3,7 +3,7 @@ import java.io.Serializable;
 
 import modelo.Mesa;
 
-public abstract class Juego implements Serializable{
+public class Juego implements Serializable{
 
 	protected String nombre;
 	protected int anio;
@@ -52,7 +52,7 @@ public abstract class Juego implements Serializable{
 	
 	
 	public Juego(String nombre, int anio, String empresa, int cantidadJugadores, boolean esDificil,
-			RestriccionEdad apto, TiposJuegos tipo, int numJugadores) {
+			RestriccionEdad apto, TiposJuegos tipo) {
 		super();
 		this.nombre = nombre;
 		this.anio = anio;

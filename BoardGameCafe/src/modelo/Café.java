@@ -14,13 +14,7 @@ import sujetos.Cliente;
 import sujetos.Cocinero;
 import sujetos.Empleado;
 import sujetos.Mesero;
-import sujetos.Persona;
 import sujetos.UsuarioComprador;
-import modelo.Reserva;
-import modelo.Venta;
-import modelo.Prestamo;
-
-import java.time.LocalDate;
 
 import sujetos.Administrador;
 import torneos.*;
@@ -48,8 +42,9 @@ public class Café implements Serializable{
 	private int idReservas = 1;
 	private int idSolicitud = 1;
 	private int idTorneos = 1;
+	private int idMesa = 9;
 
-	public Café(int capacidad, ArrayList<Platillos> menú, ArrayList<Mesa> mesas, ArrayList<Prestamo> historialPrestamos, ArrayList<Empleado> empleados, ArrayList<JuegoVenta> inventarioJuegosVenta, ArrayList<JuegoPrestamo> inventarioJuegosPrestamo, HashMap<Integer, ArrayList<Venta>> historialComprasUsuario, ArrayList<Reserva> reservas, ArrayList<Solicitud> solicitudes, ArrayList<Venta> historialVentas, ArrayList<UsuarioComprador> usuarios, ArrayList<Cliente> clientes, ArrayList<Torneo> torneos, HashMap<String, UsuarioComprador> mapaClientes, HashMap<String, Empleado> mapaEmpleados, ArrayList<Juego> catalogoJuegos, Administrador admin, int idReservas, int idSolicitud, int idTorneos) {
+	public Café(int capacidad, ArrayList<Platillos> menú, ArrayList<Mesa> mesas, ArrayList<Prestamo> historialPrestamos, ArrayList<Empleado> empleados, ArrayList<JuegoVenta> inventarioJuegosVenta, ArrayList<JuegoPrestamo> inventarioJuegosPrestamo, HashMap<Integer, ArrayList<Venta>> historialComprasUsuario, ArrayList<Reserva> reservas, ArrayList<Solicitud> solicitudes, ArrayList<Venta> historialVentas, ArrayList<UsuarioComprador> usuarios, ArrayList<Cliente> clientes, ArrayList<Torneo> torneos, HashMap<String, UsuarioComprador> mapaClientes, HashMap<String, Empleado> mapaEmpleados, ArrayList<Juego> catalogoJuegos, Administrador admin, int idReservas, int idSolicitud, int idTorneos, int idMesa) {
 		Capacidad = capacidad;
 		this.menú = menú;
 		this.mesas = mesas;
@@ -71,6 +66,7 @@ public class Café implements Serializable{
 		this.idReservas = idReservas;
 		this.idSolicitud = idSolicitud;
 		this.idTorneos = idTorneos;
+		this.idMesa = idMesa;
 	}
 
 	public int getCapacidad() {
@@ -83,6 +79,16 @@ public class Café implements Serializable{
 
 	public ArrayList<Cliente> getClientes() {
 		return clientes;
+	}
+
+	public int getIdMesa() {
+
+		setIdMesa(idMesa + 1);
+		return idMesa;
+	}
+
+	public void setIdMesa(int idMesa) {
+		this.idMesa = idMesa;
 	}
 
 	public void setClientes(ArrayList<Cliente> clientes) {
@@ -529,11 +535,11 @@ public class Café implements Serializable{
 		
 		
 		if (it.getSolicitante().getTurnoAsignado() == null || it.getEmpleadoIntercambio().getTurnoAsignado() == null) {
-			throw new CambioTurnosException("Intercambio de turno no exitoso, los empleados no tienen turno asignado");
+			throw new SolicitudException("Intercambio de turno no exitoso, los empleados no tienen turno asignado");
 		}
 		
 		if (it.getEmpleadoIntercambio().equals(it.getSolicitante())) {
-			throw new CambioTurnosException("Intercambio de turno no exitoso, no se puede intercambiar el turno de un empleado consigo mismo");
+			throw new SolicitudException("Intercambio de turno no exitoso, no se puede intercambiar el turno de un empleado consigo mismo");
 		}
 			
 			Turno turno = null;
@@ -690,7 +696,7 @@ public class Café implements Serializable{
 		getInventarioJuegosVenta().add(jv);
 	}
 
-	public void añaidrJuego(Juego j){getCatalogoJuegos().add(j); }
+	public void añadirJuego(Juego j){getCatalogoJuegos().add(j); }
 
 	public void mostrarInventarioJuegosPrestamo(){
 
@@ -962,7 +968,7 @@ public class Café implements Serializable{
 
 	public void mostrarComprasXUsuario(int cedula){
 
-		getHistorialComprasUsuario().get(cedula);
+		mostrarVentas(getHistorialComprasUsuario().get(cedula));
 
 	}
 
@@ -1000,6 +1006,63 @@ public class Café implements Serializable{
 
 		}
 
+		public String mostrarItems(ArrayList<Item> it){
+			String ans = "";
+			for(Item i: it){
+				ans += "- "+ "Producto Asociado: "+ i.getProductoAsociado() +"\n"+
+						"Cantidad: " + i.getCantidad() +"\n";
+			}
+
+			return ans;
+		}
+
+		public void mostrarVentas(ArrayList<Venta> venta){
+
+		if(venta == null || venta.isEmpty()){
+			System.out.println("No hay ventas para la cedula ingresada");
+
+		}
+
+			for(Venta v : venta){
+				System.out.println(
+						"Comprador: " + v.getComprador().getNombre() +"\n"+
+						"Fecha: " + v.getFechaVenta()+"\n"+
+						"Items: " + mostrarItems(v.getItems()) +"\n"+
+						"Total: " + v.getTotal() +"\n"+
+						"Impuestos: " + v.getImpuestos() +"\n"+
+						"Subtotal: " + v.getSubtotal()+"\n"+
+						"Propina: " + v.getPropina() +"\n"
+				);
+			}
+
+		}
+
+		public int getCapacidadMesas(){
+
+			int total = 0;
+
+			for(Mesa m : mesas){
+				total += m.getCapacidad();
+			}
+
+			return total;
+		}
+
+		public Mesa addMesa(int cap){
+
+			if (getCapacidadMesas() == getCapacidad()){
+				throw new CapacidadExcedidaException("No es posible añadir una mesa, no hay capacidad");
+			}
+
+
+			Mesa m = new Mesa(false,getIdMesa(), new ArrayList<Cliente>(),false, cap);
+
+
+			mesas.add(m);
+
+			return m;
+		}
+
 		public Empleado autenticarEmpleado(String login, int pass){
 
 			if (mapaEmpleados.containsKey(login)){
@@ -1033,6 +1096,162 @@ public class Café implements Serializable{
 
 			return null;
 		}
+
+	public void cambiarTurno (Turno tur, Empleado empl) {
+		Turno turno = null;
+
+		for(DayOfWeek day : tur.getDias()) {
+			int numMeseros = 0;
+			int numCocineros = 0;
+
+			for(Empleado emp : getEmpleados()) {
+				if (emp.equals(empl)) {
+					turno = tur;
+				}
+				else {
+					turno = emp.getTurnoAsignado();
+				}
+
+				if (turno.getDias().contains(day) && tur.getHoraEntrada().isBefore(turno.getHoraSalida()) && tur.getHoraSalida().isAfter(turno.getHoraEntrada())) {
+					if(emp instanceof Mesero) {
+						numMeseros += 1;
+					}
+					else if(emp instanceof Cocinero) {
+						numCocineros += 1;
+					}
+				}
+			}
+
+			if (numMeseros < 2 || numCocineros < 1) {
+				throw new SolicitudException("No hay el personal necesarios para hacer el cambio");
+			}
+		}
+
+		empl.cambioTurno(tur);
+	}
+
+	public void aprobarSolcitudesPendientes (){
+		if(solicitudes.isEmpty()){
+			throw new SolicitudException("No hay solicitudes pendientes");
+		}
+
+		for(Solicitud s : solicitudes){
+			if(s.getEstado().equals(EstadoSolicitud.PENDIENTE)){
+				aprobarSolicitud(s);
+			}
+		}
+
+	}
+
+	public void mostrarSolicitudes(){
+		for(Solicitud s : solicitudes){
+			if(s.getEstado().equals(EstadoSolicitud.PENDIENTE)){
+				if(s instanceof CambioTurno || s instanceof IntercambioTurno || s instanceof SugerirPlatillo){
+					System.out.println(
+							"ID: "+s.getIdSolicitud() +"\n"+
+							"Fecha: "+s.getFechaSolicitud()+"\n"+
+							"Estado: "+s.getEstado()+"\n"+
+							"Solicitante: "+s.getSolicitante().getNombre()+"\n"
+					);
+				}
+			}
+		}
+	}
+
+	public void aprobarSolicitud (Solicitud sol) {
+		if(sol instanceof CambioTurno) {
+			CambioTurno ct = (CambioTurno)sol;
+			if(validarCambioTurno(ct)) {
+				ct.cambioTurnoEmp();
+				ct.setEstado(EstadoSolicitud.APROBADA);
+			}
+			else {
+				ct.setEstado(EstadoSolicitud.RECHAZADA);
+			}
+		}
+		else if(sol instanceof IntercambioTurno) {
+			IntercambioTurno it = (IntercambioTurno)sol;
+			if(validarIntercambioTurnos(it)) {
+				it.intercambiarTurnos();
+				it.setEstado(EstadoSolicitud.APROBADA);
+			}
+			else {
+				it.setEstado(EstadoSolicitud.RECHAZADA);
+			}
+		}
+		else if(sol instanceof SugerirPlatillo) {
+			SugerirPlatillo sp = (SugerirPlatillo) sol;
+			añadirPlatillo(sp.getPlatilloSugerido());
+			sp.setEstado(EstadoSolicitud.APROBADA);
+		}
+	}
+
+	public String tipoEmpleado(Empleado emp){
+
+		String total = "";
+
+		if(emp instanceof Mesero){
+			total += "Mesero";
+		}
+		else if(emp instanceof Cocinero){
+			total += "Cocinero";
+		}
+
+		return total;
+	}
+
+	public String mostrarDias(Empleado emp){
+
+		String total = "";
+
+		for(DayOfWeek dia : emp.getTurnoAsignado().getDias()){
+			total += " "+dia;
+		}
+
+		return total;
+	}
+
+	public void mostrarEmpleados(){
+		int i = 0;
+
+		for(Empleado emp : empleados){
+			System.out.println(
+					"Opcion: "+i+"\n"+
+					"Nombre: "+emp.getNombre()+"\n"+
+					"Rol: "+ tipoEmpleado(emp) +"\n"+
+					"Dias: "+ mostrarDias(emp) +"\n"+
+					"Hora Entrada: "+ emp.getTurnoAsignado().getHoraEntrada() +"\n"+
+					"Hora Salida: "+ emp.getTurnoAsignado().getHoraSalida() +"\n"
+			);
+
+		}
+	}
+
+	public  void revisarPrestamos(){
+		for(Prestamo p : historialPrestamos){
+			if(marcarJuegoDesparecido(p)){
+				System.out.println("Se marco el juego como desaparecido al juego: "+"\n"+
+				"Nombre: "+p.getJuegoAPrestar().getInfoJuego().getNombre()+"\n"+
+				"Fecha de inicio: "+p.getFechaInicioPrestamo()+"\n"+
+				"Fecha de fin: "+p.getFechaFinPrestamo()+"\n"
+				);
+			}
+		}
+	}
+
+	public boolean marcarJuegoDesparecido(Prestamo prestamo) {
+
+		long dias = ChronoUnit.DAYS.between(prestamo.getFechaInicioPrestamo(), LocalDate.now());
+
+		if (dias > 7) {
+			prestamo.getJuegoAPrestar().setDesaparecido(true);
+			return true;
+		}
+		return false;
+	}
+
+
+
 
 		public void inicializarDatos(){
 			if(admin == null){

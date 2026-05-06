@@ -1,6 +1,7 @@
 package main;
 
 import articulos.*;
+import exceptions.CapacidadExcedidaException;
 import exceptions.JuegoNoEncontradoException;
 import exceptions.MostrarException;
 import modelo.*;
@@ -29,7 +30,7 @@ public class AdminConsola {
             System.out.println("Datos cargados");
         } catch (Exception e){
             System.out.println("No se encontró cafe, creando uno nuevo...");
-            cafe = new Café(50, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new HashMap<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new HashMap<>(), new HashMap<>(), new ArrayList<Juego>(), null, 1, 1,1);
+            cafe = new Café(50, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new HashMap<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new HashMap<>(), new HashMap<>(), new ArrayList<Juego>(), null, 1, 1,1, 9);
             cafe.inicializarDatos();
         }
 
@@ -78,10 +79,19 @@ public class AdminConsola {
                         ventasXCli();
                         break;
                     case 11:
-                        //addMesa();
+                        addMesa();
                         break;
                     case 12:
-                        //addJuego();
+                        addJuego();
+                        break;
+                    case 13:
+                        gestionarSolicitudes();
+                        break;
+                    case 14:
+                        modificarTurno();
+                        break;
+                    case 15:
+                        marcarDesaparecidoJuego();
                         break;
                     case 0:
                     exit = true;
@@ -116,8 +126,11 @@ public class AdminConsola {
         System.out.println("9. Reparar Juego");
         System.out.println("10. Ver Ventas por Cliente");
         System.out.println("11. Añadir Mesa");
+        System.out.println("12. Añadir Juego a Catalogo");
+        System.out.println("13. Gestionar Solicitudes");
+        System.out.println("14. Modificar Turno");
+        System.out.println("15. Marcar Desaparecido Juego");
         System.out.println("0. Salir y Guardar");
-
     }
 
     private static void mostrarMenuVentas(){
@@ -278,14 +291,14 @@ public class AdminConsola {
         }
 
         if(opcionPla == 1){
-            System.out.println("Es alcoholica? : " );
+            System.out.println("¿Es alcoholica? : " );
             System.out.println("1. SI" );
             System.out.println("2. NO" );
             int opcionA = sc.nextInt();
 
             boolean esAlc = (opcionA == 1);
 
-            System.out.println("Es una bebida caliente? : " );
+            System.out.println("¿Es una bebida caliente? : " );
             System.out.println("1. SI" );
             System.out.println("2. NO" );
             int opcionC = sc.nextInt();
@@ -373,7 +386,7 @@ public class AdminConsola {
         System.out.println("Seleccione un juego: " );
         int opcionJv = sc.nextInt();
 
-        if(opcionJv >= cafe.getInventarioJuegosPrestamo().size() && opcionJv < cafe.getInventarioJuegosPrestamo().size() ){
+        if(opcionJv >= 0 && opcionJv < cafe.getInventarioJuegosPrestamo().size() ){
             try{
                 cafe.repararJuegoPrestamo(cafe.getInventarioJuegosPrestamo().get(opcionJv));
             } catch (JuegoNoEncontradoException e){
@@ -386,9 +399,112 @@ public class AdminConsola {
     public static void ventasXCli(){
         System.out.println("----- CONSULTAR VENTAS POR CLIENTES -----" );
         System.out.println("Ingrese un número de cedula valido (int): " );
+        int opcionCed = sc.nextInt();
 
+        cafe.mostrarComprasXUsuario(opcionCed);
 
+    }
 
+    public static void addMesa(){
+
+        System.out.println("----- AGREGAR MESA AL CAFÉ -----" );
+        System.out.println("Ingrese la capacidad de la nueva mesa: " );
+        int cap = sc.nextInt();
+        try{
+            cafe.addMesa(cap);
+        }catch (CapacidadExcedidaException e){
+            System.out.println("No es posible añadir una mesa, no hay capacidad");
+        }
+
+    }
+
+    public static void addJuego(){
+        System.out.println("----- AGREGAR JUEGO AL CATALOGO -----" );
+        System.out.print("Nombre del juego: ");
+        String nombre = sc.nextLine();
+
+        System.out.print("Año de publicación: ");
+        int anio = sc.nextInt();
+
+        System.out.print("Empresa: ");
+        String empresa = sc.nextLine();
+
+        System.out.print("Ingrese la cantidad de jugadores: ");
+        int min = sc.nextInt();
+
+        System.out.println("Categoría del juego:");
+        for (TiposJuegos tj : TiposJuegos.values()) {
+            System.out.println((tj.ordinal() + 1) + ". " + tj.name());
+        }
+        int opCat = sc.nextInt();
+        TiposJuegos categoria = TiposJuegos.values()[opCat - 1];
+
+        System.out.println("Restricción edad:");
+        for (RestriccionEdad re : RestriccionEdad.values()) {
+            System.out.println((re.ordinal() + 1) + ". " + re.name());
+        }
+        int opEdad = sc.nextInt();
+        RestriccionEdad edad = RestriccionEdad.values()[opEdad - 1];
+
+        System.out.print("¿Es Dificil? (1. SI 2. NO): ");
+        boolean esDificil = (sc.nextInt() == 1);
+
+        Juego nuevoJuego = new Juego(nombre, anio, empresa, min, esDificil, edad, categoria);
+
+        cafe.añadirJuego(nuevoJuego);
+
+        }
+
+    public static void gestionarSolicitudes(){
+        System.out.println("----- GESTIONAR SOLICITUDES -----" );
+        System.out.println("Solicitudes pendientes: " );
+        cafe.mostrarSolicitudes();
+        System.out.println("¿Desea aprobar todas las solicitudes (1. SI 2. NO)" );
+        int opcionSol = sc.nextInt();
+
+        if(opcionSol == 1){
+            cafe.aprobarSolcitudesPendientes();
+        }
+        else if(opcionSol == 2){
+            return;
+        }
+        else{
+            System.out.println("Opción no válida. No se realizará ninguna acción.");
+        }
+    }
+
+    public static void modificarTurno(){
+
+        System.out.println("----- MODIFICAR TURNOS -----" );
+        System.out.println("Empleados Activos: " );
+        cafe.mostrarEmpleados();
+        System.out.println("Seleccione un Empleado Activo: " );
+        int opcionEmp = sc.nextInt();
+
+        if(opcionEmp < 0 || opcionEmp >= cafe.getEmpleados().size() - 1){
+            throw new MostrarException("Opción no válida.");
+        }
+
+        Empleado emp = cafe.getEmpleados().get(opcionEmp);
+
+        Turno tur = pedirDatosTurno();
+
+        CambioTurno ct = new CambioTurno(0, null, null, null, tur);
+
+        if(cafe.validarCambioTurno(ct)){
+            cafe.cambiarTurno(tur, emp);
+            System.out.println("Cambio Exitoso.");
+        }
+        else{
+            throw new MostrarException("No se pudo realizar el cambio de turno.");
+        }
+    }
+
+    public static void marcarDesaparecidoJuego(){
+        System.out.println("----- MARCAR DESAPARECIDO JUEGO -----" );
+
+        System.out.println("Se validarán los prestamos actuales" );
+        cafe.revisarPrestamos();
 
     }
 
