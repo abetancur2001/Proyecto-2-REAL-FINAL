@@ -1,7 +1,6 @@
 package main;
 
-import articulos.Alergenos;
-import articulos.Juego;
+import articulos.*;
 import com.sun.security.jgss.AuthorizationDataEntry;
 import exceptions.AutenticacionException;
 import exceptions.CapacidadExcedidaException;
@@ -74,7 +73,7 @@ public class ClienteConsola {
                         solicitarPrestamo();
                         break;
                     case 3:
-                        //comprarProducto();
+                        comprarProducto();
                         break;
                     case 4:
                         //incribirTorneo();
@@ -300,10 +299,128 @@ public class ClienteConsola {
             return;
         }
 
+
         cafe.crearPrestamo(LocalDate.now(), fechaEnt, cafe.getCatalogoJuegos().get(opcionJ), cliente, cafe.getIdPrestamo(), m);
 
     }
 
+    private static void comprarProducto(){
 
+        boolean dispo = false;
+        Mesa m = null;
+
+        if(cafe.getMapaReservas().get(cliente.getCedula()).size() > 0){
+            for(Reserva res : cafe.getMapaReservas().get(cliente.getCedula())){
+                if(res.getFechaReserva().isEqual(LocalDate.now())){
+                    dispo = true;
+                    m = res.getMesaReserva();
+                    break;
+                }
+            }
+
+        }
+
+        if(!dispo){
+            throw new MostrarException("El cliente no tiene reservas activas para el dia de hoy");
+        }
+
+        ArrayList<Item> items = new ArrayList<Item>();
+
+        boolean salir = false;
+
+
+        while(!salir){
+            mostrarMenuProductos();
+            System.out.println("Ingrese una opcion: ");
+            int opcionP = sc.nextInt();
+            switch(opcionP){
+                case 1:
+                    items.addAll(comprarJuegos());
+                    break;
+                case 2:
+                    items.addAll(comprarPlatillos());
+                    break;
+                case 3:
+                    verVentaTotal(items);
+                    break;
+                case 0:
+                    salir = true;
+                    break;
+                default:
+                    System.out.println("Opción Invalida");
+            }
+        }
+
+    }
+
+    private static ArrayList<Item> comprarJuegos(){
+
+        ArrayList<Item> s = new ArrayList<>();
+
+        System.out.println("----- COMPRAR JUEGOS -----");
+        System.out.println("Ingrese la cantidad del juegos a comprar: ");
+        int cantJ = sc.nextInt();
+        sc.nextLine();
+
+        int i = 0;
+
+        while (i<cantJ) {
+            cafe.mostrarJuegosVenta();
+            System.out.println("Ingrese una opcion: ");
+            int opcionJ = sc.nextInt();
+
+            System.out.println("¿Cuantas unidades de este juego desea comprar?: ");
+            int units = sc.nextInt();
+
+            if(opcionJ >= 0 && opcionJ < cafe.getInventarioJuegosVenta().size()){
+                JuegoVenta jv = cafe.getInventarioJuegosVenta().get(opcionJ);
+                s.add(new Item(units, jv));
+                i += 1;
+
+            }
+        }
+        return s;
+    }
+
+    private static ArrayList<Item> comprarPlatillos(){
+
+        ArrayList<Item> p = new ArrayList<>();
+
+        System.out.println("----- COMPRAR PLATILLOS -----");
+        System.out.println("Ingrese la cantidad del patillos a comprar: ");
+        int cantP = sc.nextInt();
+        sc.nextLine();
+
+        int i = 0;
+
+        while(i<cantP){
+            cafe.mostrarMenu();
+            System.out.println("Ingrese una opcion: ");
+            int opcionP = sc.nextInt();
+            System.out.println("¿Cuantas unidades de este platillo desea comprar?: ");
+            int units = sc.nextInt();
+
+            if(opcionP >= 0 && opcionP < cafe.getMenú().size()){
+                Platillos pla = cafe.getMenú().get(opcionP);
+                p.add(new Item(units, pla));
+                i += 1;
+                }
+            }
+
+        return p;
+        }
+
+
+    private static void verVentaTotal(ArrayList<Item> items){
+    }
+
+
+    private static void mostrarMenuProductos(){
+        System.out.println("----- MENU PRODUCTOS -----");
+        System.out.println("1. Juegos");
+        System.out.println("2. Platillos");
+        System.out.println("3. Ver Venta Total");
+        System.out.println("0. Salir");
+    }
 
 }

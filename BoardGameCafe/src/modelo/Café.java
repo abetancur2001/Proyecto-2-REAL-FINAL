@@ -430,6 +430,22 @@ public class Café implements Serializable{
 
 	}
 
+	public void mostrarJuegosVenta(){
+		int i = 0;
+		for(JuegoVenta jv : inventarioJuegosVenta) {
+			System.out.println("Opcion: "+ i + "\n"+
+					"Nombre: "+ jv.getInfoJuegoVenta().getNombre() + "\n"+
+					"Año: "+ jv.getInfoJuegoVenta().getNombre() + "\n"+
+					"Empresa: " + jv.getInfoJuegoVenta().getEmpresa() + "\n"+
+					"Cantidad de Jugadores: " + jv.getInfoJuegoVenta().getCantidadJugadores() + "\n"+
+					"¿Es Dificil?: "+ jv.getInfoJuegoVenta().isEsDificil() + "\n"+
+					"Es Apto para: " + jv.getInfoJuegoVenta().getApto() + "\n"+
+					"Tipo: " + jv.getInfoJuegoVenta().getTipo() + "\n"
+			);
+
+		}
+	}
+
 	public Venta crearVenta(ArrayList<Item> items, UsuarioComprador comprador, LocalDate fechaVenta, Mesa mesa,
 			boolean usarPuntos, boolean usaCodigo) {
 
@@ -723,6 +739,8 @@ public class Café implements Serializable{
 	}
 
 	public void añadirJuego(Juego j){getCatalogoJuegos().add(j); }
+
+
 
 	public void mostrarInventarioJuegosPrestamo(){
 
@@ -1274,6 +1292,35 @@ public class Café implements Serializable{
 			return true;
 		}
 		return false;
+	}
+
+	public void mostrarMenu(){
+
+		int i = 0;
+
+		for(Platillos p : menú){
+
+			String tipo = null;
+
+			if(p instanceof Bebida){
+				tipo = "Bebida";
+			}
+			else if(p instanceof Pasteleria){
+				tipo = "Pasteleria";
+			}
+
+			System.out.println(
+					"Opcion: "+i+"\n"+
+					"Nombre: "+p.getNombrePlatillo()+"\n"+
+					"Tipo: "+tipo+"\n"+
+					"Precio: "+p.getPrecio()+"\n"
+			);
+
+			i+=1;
+
+
+		}
+
 	}
 
 
