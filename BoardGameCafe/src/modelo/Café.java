@@ -477,6 +477,13 @@ public class Café implements Serializable{
 
 		}
 
+		if (usaCodigo && comprador.getDescuentosDisponibles() <= 0){
+			throw new VentaNoPermitidaException("No hay descuentos disponibles");
+		}
+		else if(usaCodigo && comprador.getDescuentosDisponibles() > 0){
+			comprador.setDescuentosDisponibles(comprador.getDescuentosDisponibles() - 1);
+		}
+
 		ventaAux.setTotal(ventaAux.calculoCuenta(usarPuntos, usaCodigo));
 		historialVentas.add(ventaAux);
 		comprador.agregarCompra(ventaAux);
@@ -533,7 +540,10 @@ public class Café implements Serializable{
 		setIdReservas(idReservas + 1);
 		mesaDis.setOcupada(true);
 		res = new Reserva(id, fechaReserva, mesaDis, reservadoPor, numPersonas,horaReserva);
-		mapaReservas.put(reservadoPor.getCedula(), new ArrayList<>());
+
+		if (!mapaReservas.containsKey(reservadoPor.getCedula())) {
+			mapaReservas.put(reservadoPor.getCedula(), new ArrayList<>());
+		}
 		mapaReservas.get(reservadoPor.getCedula()).add(res);
 		reservas.add(res);
 		

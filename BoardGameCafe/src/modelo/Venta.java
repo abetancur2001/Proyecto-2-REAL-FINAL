@@ -184,15 +184,19 @@ public class Venta implements Serializable{
 
 		if (usarPuntos && (comprador.getPuntosFidelidad() <= total)) {
 			precioPu = (total - comprador.getPuntosFidelidad()) + propina;
-		} else {
+		}
+		else if(usarPuntos && (comprador.getPuntosFidelidad() >= total)){
+			precioPu = propina;
+		}
+		else {
 			precioPu = total + propina;
 		}
 		
-		sumarPuntos(total);
+		sumarPuntos(total-comprador.getPuntosFidelidad());
 		
 		setTotal(precioPu);
 		setSubtotal(subTotal);
-		setImpuestos(total - subtotal);
+		setImpuestos(total - subTotal);
 		setPropina(propina);
 		
 		return precioPu;

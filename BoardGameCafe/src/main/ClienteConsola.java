@@ -5,6 +5,7 @@ import com.sun.security.jgss.AuthorizationDataEntry;
 import exceptions.AutenticacionException;
 import exceptions.CapacidadExcedidaException;
 import exceptions.MostrarException;
+import exceptions.VentaNoPermitidaException;
 import modelo.*;
 import persistencia.GestorPersistencia;
 import sujetos.Cliente;
@@ -317,7 +318,6 @@ public class ClienteConsola {
                     break;
                 }
             }
-
         }
 
         if(!dispo){
@@ -327,7 +327,6 @@ public class ClienteConsola {
         ArrayList<Item> items = new ArrayList<Item>();
 
         boolean salir = false;
-
 
         while(!salir){
             mostrarMenuProductos();
@@ -412,6 +411,67 @@ public class ClienteConsola {
 
 
     private static void verVentaTotal(ArrayList<Item> items){
+        System.out.println("----- VER TOTAL VENTA -----");
+
+        if(items.isEmpty()){
+            throw new VentaNoPermitidaException("No hay items para vender");
+        }
+
+        System.out.println("Los productos actualmente seleccionados son: ");
+        mostrarProductos(items);
+        System.out.println("Confirme si esta correcto (1. SI 2. NO): ");
+        int conf = sc.nextInt();
+        System.out.println("¿Desea usar puntos? (1. SI 2. NO): ");
+        boolean opcionPun = (sc.nextInt() == 1);
+        System.out.println("¿Desea usar codigo descuento? (1. SI 2. NO): ");
+        boolean opcionCod = (sc.nextInt() == 1);
+
+        if(conf == 2){
+            return;
+        }
+        else if(conf == 1){
+            Mesa m = null;
+            ArrayList<Reserva> reservas = cafe.getMapaReservas().get(cliente.getCedula());
+            if(reservas.size() > 0 && reservas != null){
+                for(Reserva res : cafe.getMapaReservas().get(cliente.getCedula())){
+                    if(res.getFechaReserva().isEqual(LocalDate.now())){
+                        m = res.getMesaReserva();
+                        break;
+                    }
+                }
+
+            }
+            try{
+                cafe.crearVenta(items, cliente, LocalDate.now(),m,opcionPun, opcionCod);
+            } catch (VentaNoPermitidaException e){
+                System.out.println(e.getMessage());
+            }
+        }
+
+    }
+
+    private static void mostrarProductos(ArrayList<Item> items){
+
+        for(Item i: items){
+            String nom = "";
+            Producto p = i.getProductoAsociado();
+            if(p instanceof JuegoVenta){
+                JuegoVenta jv = (JuegoVenta) p;
+                nom = jv.getInfoJuegoVenta().getNombre();
+            }
+            else if(p instanceof Platillos){
+                Platillos pla = (Platillos) p;
+                nom = pla.getNombrePlatillo();
+            }
+
+            System.out.println(
+                    "Nombre: " + nom + "\n"+
+                    "Precio: " + p.getPrecio()+ "\n"+
+                    "Cantidad: " + i.getCantidad()
+                    );
+
+        }
+
     }
 
 
