@@ -12,6 +12,7 @@ import exceptions.*;
 public abstract class Torneo {
 
 	private int idTorneo;
+	private String nombre;
 	private DayOfWeek diaSemana;
 	private int numParticipantes;
 	private Juego juegoAsociado;
@@ -57,13 +58,21 @@ public abstract class Torneo {
 		this.inscripciones = inscripciones;
 	}
 
-	public Torneo(int idTorneo, DayOfWeek diaSemana, int numParticipantes, Juego juegoAsociado) {
-		super();
+	public Torneo(int idTorneo, String nombre, DayOfWeek diaSemana, int numParticipantes, Juego juegoAsociado, HashMap<Integer, ArrayList<UsuarioComprador>> inscripciones) {
 		this.idTorneo = idTorneo;
+		this.nombre = nombre;
 		this.diaSemana = diaSemana;
 		this.numParticipantes = numParticipantes;
 		this.juegoAsociado = juegoAsociado;
 		this.inscripciones = new HashMap<>();
+	}
+
+	public String getNombre() {
+		return nombre;
+	}
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
 	}
 
 	public int getNumTotalParticipantesActuales() {

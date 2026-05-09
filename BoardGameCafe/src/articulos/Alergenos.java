@@ -4,12 +4,12 @@ public enum Alergenos {
     GLUTEN,
     LACTEOS,
     HUEVOS,
-    MANI,           // O CACAHUETES
-    NUECES,         // Incluye almendras, avellanas, etc.
+    MANI,
+    NUECES,
     SOYA,
     PESCADO,
     MARISCOS,
-    SULFITOS,       // Común en vinos y conservas
+    SULFITOS,
     MOSTAZA,
     APIO,
     SESAMO

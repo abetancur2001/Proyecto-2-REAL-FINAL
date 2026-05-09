@@ -2,13 +2,13 @@ package main;
 
 import articulos.*;
 import com.sun.security.jgss.AuthorizationDataEntry;
-import exceptions.AutenticacionException;
-import exceptions.CapacidadExcedidaException;
-import exceptions.MostrarException;
-import exceptions.VentaNoPermitidaException;
+import exceptions.*;
 import modelo.*;
 import persistencia.GestorPersistencia;
 import sujetos.Cliente;
+import sujetos.Empleado;
+import sujetos.UsuarioComprador;
+import torneos.Torneo;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -35,8 +35,6 @@ public class ClienteConsola {
             cafe = new Café(50, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new HashMap<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new HashMap<>(), new HashMap<>(), new ArrayList<Juego>(), null, new HashMap<>(), 1,1, 9, 1, 0);
             cafe.inicializarDatos();
         }
-
-
 
         boolean salir = false;
         boolean auten = false;
@@ -77,27 +75,29 @@ public class ClienteConsola {
                         comprarProducto();
                         break;
                     case 4:
-                        //incribirTorneo();
+                        incribirTorneo();
                         break;
                     case 5:
-                        //desinscribirTorneo();
+                        desinscribirTorneo();
                         break;
                     case 6:
-                        //consultarPuntos();
+                        consultarPuntos();
                         break;
                     case 7:
-                        //verJuegosFavs();
+                        verJuegosFavs();
                         break;
                     case 0:
-                        salir = true;
+                        exit = true;
                         break;
                         default:
                         System.out.println("Opción Invalida");
                 }
             }
+
+            gp.guardarCafe(cafe);
+            System.out.println("Datos guardados");
+
         }
-
-
 
     }
 
@@ -106,7 +106,7 @@ public class ClienteConsola {
         ArrayList<Juego> juegos = new ArrayList<Juego>();
         ArrayList<Alergenos> a = new ArrayList<>();
 
-        System.out.println("----- CREAR CUENTA-----");
+        System.out.println("----- CREAR CUENTA CLIENTE -----");
 
         sc.nextLine();
         System.out.println("Ingrese su Nombre Completo: ");
@@ -117,7 +117,11 @@ public class ClienteConsola {
         int cedula = sc.nextInt();
         System.out.println("¿Cuantos Juegos Favoritos quiere añadir?: ");
         int cantidadJ = sc.nextInt();
-        cafe.mostrarCatalogoJuegos();
+
+        if (cantidadJ != 0) {
+            cafe.mostrarCatalogoJuegos();
+        }
+
         int i = 0;
         while(i < cantidadJ){
             System.out.println("Ingrese una opcion: ");
@@ -180,6 +184,7 @@ public class ClienteConsola {
             throw new AutenticacionException("Usuario no encontrado");
         }
 
+        cliente = cafe.autenticarCliente(login, pass);
         return true;
 
     }
@@ -198,7 +203,7 @@ public class ClienteConsola {
         System.out.println("----- MENU CLIENTE PRINCIPAL-----");
         System.out.println("1. Hacer una Reserva");
         System.out.println("2. Solicitar Prestamo");
-        System.out.println("3. Comprar Producto");
+        System.out.println("3. Comprar Productos");
         System.out.println("4. Inscribirse a Torneo");
         System.out.println("5. Desinscribirse de Torneo");
         System.out.println("6. Consultar Puntos");
@@ -217,7 +222,7 @@ public class ClienteConsola {
         int dia = sc.nextInt();
         System.out.println("Ingrese el Mes de la Reserva (1-12): ");
         int mes = sc.nextInt();
-        System.out.println("Ingrese dia de la Reserva: ");
+        System.out.println("Ingrese el año de la Reserva: ");
         int anio = sc.nextInt();
 
         try{
@@ -266,6 +271,10 @@ public class ClienteConsola {
 
         boolean dispo = false;
         Mesa m = null;
+
+        if(cafe.getMapaReservas().get(cliente.getCedula()) == null || cafe.getMapaReservas().get(cliente.getCedula()).size() == 0){
+            throw new MostrarException("El cliente no tiene reservas activas");
+        }
 
         if(cafe.getMapaReservas().get(cliente.getCedula()).size() > 0){
             for(Reserva res : cafe.getMapaReservas().get(cliente.getCedula())){
@@ -432,7 +441,7 @@ public class ClienteConsola {
         else if(conf == 1){
             Mesa m = null;
             ArrayList<Reserva> reservas = cafe.getMapaReservas().get(cliente.getCedula());
-            if(reservas.size() > 0 && reservas != null){
+            if(reservas != null && reservas.size() > 0){
                 for(Reserva res : cafe.getMapaReservas().get(cliente.getCedula())){
                     if(res.getFechaReserva().isEqual(LocalDate.now())){
                         m = res.getMesaReserva();
@@ -473,6 +482,144 @@ public class ClienteConsola {
         }
 
     }
+
+    private static void incribirTorneo(){
+        System.out.println("----- INSCRIBIRSE AL TORNEO -----");
+
+        ArrayList<UsuarioComprador> usuarios = new ArrayList<>();
+
+        if (cafe.getTorneos().isEmpty()) {
+            throw new TorneosException("No hay torneos disponibles");
+        }
+
+        cafe.mostrarTorneos();
+        System.out.println("Ingrese la opcion del torneo que desea inscribirse: ");
+        int opcionT = sc.nextInt();
+        if(opcionT < 0 || opcionT >= cafe.getTorneos().size()){
+            throw new TorneosException("Opcion invalida");
+        }
+
+        System.out.println("Ingrese la cantidad de usuarios que desea inscribir: ");
+        int cantUs = sc.nextInt();
+
+        int i = 0;
+        while(i<cantUs){
+            System.out.println("Es cliente o Empleado? (1. Cliente 2. Empleado): )");
+            int tipo = sc.nextInt();
+
+            if(tipo == 1){
+                System.out.println("Ingrese el login del cliente: )");
+                String login = sc.next();
+                Cliente u = cafe.getMapaClientes().get(login);
+
+                if(u == null){
+                    throw new TorneosException("El cliente no existe");
+                }
+
+                usuarios.add(u);
+            }
+            else if(tipo == 2){
+                System.out.println("Ingrese el login del empleado: )");
+                String login = sc.next();
+                Empleado u = cafe.getMapaEmpleados().get(login);
+
+                if (u == null) {
+                    throw new TorneosException("El empleado no existe");
+                }
+
+                usuarios.add(u);
+            }
+            i += 1;
+        }
+
+        Torneo t = cafe.getTorneos().get(opcionT);
+
+        t.inscribir(cliente,usuarios);
+        System.out.println("Inscripcion exitosa");
+
+
+    }
+
+    private static void desinscribirTorneo(){
+        System.out.println("----- DESINSCRIBIRSE AL TORNEO -----");
+
+        ArrayList<Torneo> tor = new ArrayList<>();
+        Torneo torn = null;
+
+        try{
+            tor = cafe.mostrarTorneosCliente(cliente);
+        } catch (TorneosException e){
+            System.out.println(e.getMessage());
+            return;
+        }
+
+        int i = 0;
+        for(Torneo t : tor){
+            System.out.println(
+                    "Opcion: "+i+"\n"+
+                            "Nombre: " + t.getNombre() +"\n" +
+                            "Dia: " + t.getDiaSemana() +"\n" +
+                            "Numero de jugadores: " + t.getNumParticipantes() +"\n"+
+                            "Juego: " + t.getJuegoAsociado().getNombre()
+            );
+            i += 1;
+        }
+
+
+        System.out.println("Ingrese la opcion del torneo que desea desinscribirse: ");
+        int opcionT = sc.nextInt();
+        torn = tor.get(opcionT);
+
+        System.out.println("¿Desea desinscribirse de torneo? (1. SI 2. NO): ");
+        int opcionD = sc.nextInt();
+
+        if (opcionD == 1) {
+            try{
+                torn.desinscribir(cliente);
+                System.out.println("Desinscripcion exitosa");
+            } catch (TorneosException e){
+                System.out.println(e.getMessage());
+            }
+
+        }
+        else if (opcionD == 2) {
+            System.out.println("Desinscripcion cancelada");
+            return;
+        }
+        else {
+            System.out.println("Opcion invalida");
+        }
+
+    }
+
+    private static void consultarPuntos(){
+        System.out.println("----- CONSULTA DE PUNTOS -----");
+        System.out.println("Puntos Disponibles: "+ cliente.getPuntosFidelidad());
+        return;
+    }
+
+    private static void verJuegosFavs() {
+        System.out.println("----- VER JUEGOS FAVORITOS -----");
+
+        if(cliente.getJuegosFav().isEmpty() || cliente.getJuegosFav() == null){
+            System.out.println("El cliente no tiene juegos favoritos");
+            return;
+        }
+
+        System.out.println("Juegos favoritos del cliente: ");
+        for (Juego j : cliente.getJuegosFav()) {
+            System.out.println(
+                    "Nombre: " + j.getNombre() + "\n" +
+                            "Año: " + j.getAnio() + "\n" +
+                            "Empresa: " + j.getEmpresa() + "\n" +
+                            "Cantidad de Jugadores: " + j.getCantidadJugadores() + "\n" +
+                            "¿Es Dificil?: " + j.isEsDificil() + "\n" +
+                            "Es Apto para: " + j.getApto() + "\n" +
+                            "Tipo: " + j.getTipo() + "\n"
+            );
+        }
+    }
+
 
 
     private static void mostrarMenuProductos(){

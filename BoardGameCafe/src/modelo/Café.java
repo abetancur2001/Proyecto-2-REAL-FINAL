@@ -35,7 +35,7 @@ public class Café implements Serializable{
 	private ArrayList<UsuarioComprador> usuarios;
 	private ArrayList<Cliente> clientes;
 	private ArrayList<Torneo> torneos;
-	private HashMap<String, UsuarioComprador> mapaClientes;
+	private HashMap<String, Cliente> mapaClientes;
 	private HashMap<String, Empleado> mapaEmpleados;
 	private ArrayList<Juego> catalogoJuegos;
 	private Administrador admin;
@@ -55,7 +55,7 @@ public class Café implements Serializable{
 		this.idPrestamo = idPrestamo;
 	}
 
-	public Café(int capacidad, ArrayList<Platillos> menú, ArrayList<Mesa> mesas, ArrayList<Prestamo> historialPrestamos, ArrayList<Empleado> empleados, ArrayList<JuegoVenta> inventarioJuegosVenta, ArrayList<JuegoPrestamo> inventarioJuegosPrestamo, HashMap<Integer, ArrayList<Venta>> historialComprasUsuario, ArrayList<Reserva> reservas, ArrayList<Solicitud> solicitudes, ArrayList<Venta> historialVentas, ArrayList<UsuarioComprador> usuarios, ArrayList<Cliente> clientes, ArrayList<Torneo> torneos, HashMap<String, UsuarioComprador> mapaClientes, HashMap<String, Empleado> mapaEmpleados, ArrayList<Juego> catalogoJuegos, Administrador admin, HashMap<Integer, ArrayList<Reserva>> mapaReservas, int idReservas, int idSolicitud, int idTorneos, int idMesa, int idPrestamo) {
+	public Café(int capacidad, ArrayList<Platillos> menú, ArrayList<Mesa> mesas, ArrayList<Prestamo> historialPrestamos, ArrayList<Empleado> empleados, ArrayList<JuegoVenta> inventarioJuegosVenta, ArrayList<JuegoPrestamo> inventarioJuegosPrestamo, HashMap<Integer, ArrayList<Venta>> historialComprasUsuario, ArrayList<Reserva> reservas, ArrayList<Solicitud> solicitudes, ArrayList<Venta> historialVentas, ArrayList<UsuarioComprador> usuarios, ArrayList<Cliente> clientes, ArrayList<Torneo> torneos, HashMap<String, Cliente> mapaClientes, HashMap<String, Empleado> mapaEmpleados, ArrayList<Juego> catalogoJuegos, Administrador admin, HashMap<Integer, ArrayList<Reserva>> mapaReservas, int idReservas, int idSolicitud, int idTorneos, int idMesa, int idPrestamo) {
 		Capacidad = capacidad;
 		this.menú = menú;
 		this.mesas = mesas;
@@ -126,11 +126,11 @@ public class Café implements Serializable{
 		this.catalogoJuegos = catalogoJuegos;
 	}
 
-	public HashMap<String, UsuarioComprador> getMapaClientes() {
+	public HashMap<String, Cliente> getMapaClientes() {
 		return mapaClientes;
 	}
 
-	public void setMapaClientes(HashMap<String, UsuarioComprador> mapaClientes) {
+	public void setMapaClientes(HashMap<String, Cliente> mapaClientes) {
 		this.mapaClientes = mapaClientes;
 	}
 
@@ -668,7 +668,7 @@ public class Café implements Serializable{
 		return total;
 	}
 	
-	public Torneo crearTorneo(DayOfWeek diaSemana, int numParticipantes, Juego juegoAsociado, double tarifaEntrada, boolean esCompetitivo) {
+	public Torneo crearTorneo(DayOfWeek diaSemana, String nombre, int numParticipantes, Juego juegoAsociado, double tarifaEntrada, boolean esCompetitivo) {
 		
 		Torneo torneo;
 		int id = idTorneos;
@@ -680,10 +680,10 @@ public class Café implements Serializable{
 		
 		if (esCompetitivo) {
 			
-			torneo = new Competitivo(id, diaSemana, numParticipantes, juegoAsociado, tarifaEntrada);
+			torneo = new Competitivo(id, nombre, diaSemana, numParticipantes, juegoAsociado,new HashMap<>(), tarifaEntrada);
 		}
 		else {
-			torneo = new Amistoso(id, diaSemana, numParticipantes, juegoAsociado);
+			torneo = new Amistoso(id, nombre,  diaSemana, numParticipantes, juegoAsociado, new HashMap<>());
 		}
 		
 		torneos.add(torneo);
@@ -1132,7 +1132,7 @@ public class Café implements Serializable{
 		public Cliente autenticarCliente(String login, int pass){
 
 			if (mapaClientes.containsKey(login)){
-				Cliente c = (Cliente) mapaClientes.get(login);
+				Cliente c = mapaClientes.get(login);
 				if (c.getPassword() == pass){
 					return c;
 				}
@@ -1330,6 +1330,50 @@ public class Café implements Serializable{
 
 
 		}
+
+	}
+
+	public void mostrarTorneos(){
+
+		int i = 0;
+		for(Torneo t : torneos){
+			System.out.println(
+					"Opcion: "+i+"\n"+
+					"Nombre: " + t.getNombre() +"\n" +
+					 "Dia: " + t.getDiaSemana() +"\n" +
+					"Numero de jugadores: " + t.getNumParticipantes() +"\n"+
+					"Juego: " + t.getJuegoAsociado().getNombre()
+			);
+			i += 1;
+		}
+	}
+
+	public ArrayList<Torneo> mostrarTorneosCliente(UsuarioComprador uc){
+		ArrayList<Torneo> tor = new ArrayList<>();
+
+		for(Torneo t : getTorneos()){
+			if(t.getInscripciones().containsKey(uc.getCedula())){
+				tor.add(t);
+			}
+		}
+
+		if (tor.isEmpty()) {
+			throw new TorneosException("El cliente no tiene inscripciones en torneos");
+		}
+
+		int i = 0;
+		for(Torneo t : tor){
+			System.out.println(
+					"Opcion: "+i+"\n"+
+							"Nombre: " + t.getNombre() +"\n" +
+							"Dia: " + t.getDiaSemana() +"\n" +
+							"Numero de jugadores: " + t.getNumParticipantes() +"\n"+
+							"Juego: " + t.getJuegoAsociado().getNombre()
+			);
+			i += 1;
+		}
+
+		return tor;
 
 	}
 

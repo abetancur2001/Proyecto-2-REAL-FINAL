@@ -19,11 +19,8 @@ public class Competitivo extends Torneo{
 		this.tarifaEntrada = tarficaEntrada;
 	}
 
-	public Competitivo(int idTorneo, DayOfWeek diaSemana, int numParticipantes, Juego juegoAsociado, double tarifaEntrada) {
-		super(idTorneo, diaSemana, numParticipantes, juegoAsociado);
+	public Competitivo(int idTorneo, String nombre, DayOfWeek diaSemana, int numParticipantes, Juego juegoAsociado, HashMap<Integer, ArrayList<UsuarioComprador>> inscripciones, double tarifaEntrada) {
+		super(idTorneo, nombre, diaSemana, numParticipantes, juegoAsociado, inscripciones);
 		this.tarifaEntrada = tarifaEntrada;
 	}
-	
-	
-
 }

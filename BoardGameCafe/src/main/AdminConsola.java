@@ -94,6 +94,9 @@ public class AdminConsola {
                     case 15:
                         marcarDesaparecidoJuego();
                         break;
+                    case 16:
+                        crearTorneo();
+                        break;
                     case 0:
                     exit = true;
                     break;
@@ -131,6 +134,7 @@ public class AdminConsola {
         System.out.println("13. Gestionar Solicitudes");
         System.out.println("14. Modificar Turno");
         System.out.println("15. Marcar Desaparecido Juego");
+        System.out.println("16. Crear Torneo");
         System.out.println("0. Salir y Guardar");
     }
 
@@ -179,7 +183,7 @@ public class AdminConsola {
         System.out.println("Cantidad de dias que va a trabajar:  ");
         int cantDias = sc.nextInt();
         int i = 0;
-        System.out.println("Dias: 1. Domingo 2. Lunes 3. Martes 4. Miercoles 5. Jueves 6. Viernes 7. Sabado ");
+        System.out.println("Dias: 1. Lunes 2. Martes 3. Miercoles 4. Jueves 5. Viernes 6. Sabado 7. Domingo ");
         while(i < cantDias){
             System.out.println("Ingrese un dia (solo int): ");
             int dia = sc.nextInt();
@@ -292,7 +296,7 @@ public class AdminConsola {
         }
 
         if(opcionPla == 1){
-            System.out.println("¿Es alcoholica? : " );
+            System.out.println("¿Es? alcoholica : " );
             System.out.println("1. SI" );
             System.out.println("2. NO" );
             int opcionA = sc.nextInt();
@@ -419,8 +423,8 @@ public class AdminConsola {
 
     }
 
-    public static void addJuego(){
-        System.out.println("----- AGREGAR JUEGO AL CATALOGO -----" );
+    public static void addJuego() {
+        System.out.println("----- AGREGAR JUEGO AL CATALOGO -----");
         System.out.print("Nombre del juego: ");
         String nombre = sc.nextLine();
 
@@ -454,7 +458,7 @@ public class AdminConsola {
 
         cafe.añadirJuego(nuevoJuego);
 
-        }
+    }
 
     public static void gestionarSolicitudes(){
         System.out.println("----- GESTIONAR SOLICITUDES -----" );
@@ -507,6 +511,48 @@ public class AdminConsola {
         System.out.println("Se validarán los prestamos actuales" );
         cafe.revisarPrestamos();
 
+    }
+
+    public static void  crearTorneo() {
+        int precio = 0;
+        System.out.println("----- CREAR TORNEO -----");
+        System.out.println("Ingrese el nombre del torneo: ");
+        String nombre = sc.nextLine();
+
+        System.out.println("Ingrese el dia que se va a hacer el torneo: ");
+        System.out.println("Dias: 1. Lunes 2. Martes 3. Miercoles 4. Jueves 5. Viernes 6. Sabado 7. Domingo ");
+        int opcionD = sc.nextInt();
+
+        DayOfWeek dia = DayOfWeek.of(opcionD);
+        Juego juego = null;
+
+        System.out.println("Ingrese la cantidad de participantes: ");
+        int cantPart = sc.nextInt();
+        cafe.mostrarCatalogoJuegos();
+
+        System.out.println("Ingrese una opcion: ");
+        int opcion = sc.nextInt();
+        if (opcion < 0 || opcion >= cafe.getCatalogoJuegos().size()) {
+            throw new MostrarException("Opcion invalida");
+        }
+
+        juego = (cafe.getCatalogoJuegos().get(opcion));
+
+        System.out.println("¿El torneo es competitivo? (1. SI 2. NO) : " );
+        boolean esComp = (sc.nextInt() == 1);
+
+        if (esComp) {
+            System.out.println("Ingrese la tarifa de entrada al torneo: ");
+            precio = sc.nextInt();
+            sc.nextLine();
+        }
+
+        try {
+            cafe.crearTorneo(dia, nombre, cantPart, juego, precio, esComp);
+            System.out.println("Torneo creado exitosamente");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     public static int leerOpcion(){
