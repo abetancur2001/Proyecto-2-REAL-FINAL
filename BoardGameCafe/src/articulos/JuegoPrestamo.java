@@ -3,6 +3,7 @@ package articulos;
 import java.io.Serializable;
 
 public class JuegoPrestamo implements Serializable{
+	private static final long serialVersionUID = 1L;
 	private boolean disponible;
 	private boolean desaparecido;
 	private EstadoJuego estado;

@@ -3,6 +3,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public abstract class Platillos extends Producto implements Serializable{
+	private static final long serialVersionUID = 1L;
 	protected int precio;
 	protected String nombrePlatillo;
 	protected ArrayList<Alergenos> Alergenos;

@@ -1,5 +1,6 @@
 package torneos;
 
+import java.io.Serializable;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,8 +11,9 @@ import sujetos.UsuarioComprador;
 import articulos.*;
 import exceptions.*;
 
-public abstract class Torneo {
+public abstract class Torneo implements Serializable {
 
+	private static final long serialVersionUID = 1L;
 	private int idTorneo;
 	private String nombre;
 	private DayOfWeek diaSemana;

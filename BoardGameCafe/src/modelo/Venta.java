@@ -12,6 +12,7 @@ import java.time.LocalDate;
 
 public class Venta implements Serializable{
 
+	private static final long serialVersionUID = 1L;
 	private ArrayList<Item> items;
 	private UsuarioComprador comprador;
 	private LocalDate fechaVenta;

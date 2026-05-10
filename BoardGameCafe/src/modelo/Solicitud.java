@@ -6,6 +6,7 @@ import sujetos.Empleado;
 
 public abstract class Solicitud implements Serializable{
 
+	private static final long serialVersionUID = 1L;
 	protected int idSolicitud;
 	protected LocalDate fechaSolicitud;
 	protected EstadoSolicitud estado;

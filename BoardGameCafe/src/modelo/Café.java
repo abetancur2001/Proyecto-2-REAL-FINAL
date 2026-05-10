@@ -21,6 +21,7 @@ import torneos.*;
 
 public class Café implements Serializable{
 
+	private static final long serialVersionUID = 1L;
 	private int Capacidad;
 	private ArrayList<Platillos> menú;
 	private ArrayList<Mesa> mesas;
@@ -364,7 +365,11 @@ public class Café implements Serializable{
 	}
 	
 	public void validarPrestamo (JuegoPrestamo jp) {
-		
+
+		if (!jp.getInfoJuego().isEsDificil()) {
+			return;
+		}
+
 		boolean hayMesero = false;
 		
 		if (jp.getInfoJuego().isEsDificil()) {
@@ -435,14 +440,17 @@ public class Café implements Serializable{
 		for(JuegoVenta jv : inventarioJuegosVenta) {
 			System.out.println("Opcion: "+ i + "\n"+
 					"Nombre: "+ jv.getInfoJuegoVenta().getNombre() + "\n"+
-					"Año: "+ jv.getInfoJuegoVenta().getNombre() + "\n"+
+					"Año: "+ jv.getInfoJuegoVenta().getAnio() + "\n"+
 					"Empresa: " + jv.getInfoJuegoVenta().getEmpresa() + "\n"+
 					"Cantidad de Jugadores: " + jv.getInfoJuegoVenta().getCantidadJugadores() + "\n"+
 					"¿Es Dificil?: "+ jv.getInfoJuegoVenta().isEsDificil() + "\n"+
 					"Es Apto para: " + jv.getInfoJuegoVenta().getApto() + "\n"+
-					"Tipo: " + jv.getInfoJuegoVenta().getTipo() + "\n"
-			);
+					"Tipo: " + jv.getInfoJuegoVenta().getTipo() + "\n"+
+					"Precio: " + jv.getPrecio() + "\n" +
+					"Stock: " + jv.getStock() + "\n"
 
+			);
+			i += 1;
 		}
 	}
 
@@ -518,10 +526,14 @@ public class Café implements Serializable{
 	}
 	
 	public Reserva crearReserva(LocalDate fechaReserva,
-			Cliente reservadoPor, int numPersonas, LocalTime horaReserva) {
+								Cliente reservadoPor, int numPersonas, LocalTime horaReserva) {
 		
 		Reserva res = null;
-		
+
+		for (Empleado emp : getEmpleados()) {
+			System.out.println(emp.getNombre() + " dias: " + emp.getTurnoAsignado().getDias());
+		}
+
 		DayOfWeek diaReserva = fechaReserva.getDayOfWeek();
 		
 		if(!hayCapacidad(numPersonas)) {
@@ -818,7 +830,7 @@ public class Café implements Serializable{
 		for(Juego j : catalogoJuegos){
 			System.out.println("Opcion: "+ i + "\n"+
 					"Nombre: "+ j.getNombre() + "\n"+
-					"Año: "+ j.getNombre() + "\n"+
+					"Año: "+ j.getAnio() + "\n"+
 					"Empresa: " + j.getEmpresa() + "\n"+
 					"Cantidad de Jugadores: " + j.getCantidadJugadores() + "\n"+
 					"¿Es Dificil?: "+ j.isEsDificil() + "\n"+
@@ -1341,13 +1353,31 @@ public class Café implements Serializable{
 	public void mostrarTorneos(){
 
 		int i = 0;
+
+
 		for(Torneo t : torneos){
+
+			if(t instanceof Competitivo){
+
+				Competitivo comp = (Competitivo) t;
+
+				System.out.println(
+						"Opcion: "+i+"\n"+
+								"Nombre: " + t.getNombre() +"\n" +
+								"Dia: " + t.getDiaSemana() +"\n" +
+								"Numero de jugadores: " + t.getNumParticipantes() +"\n"+
+								"Juego: " + t.getJuegoAsociado().getNombre() +"\n" +
+								"Precio Entrada: " + ((Competitivo) t).getTarifaEntrada()
+				);
+			}
+
 			System.out.println(
 					"Opcion: "+i+"\n"+
 					"Nombre: " + t.getNombre() +"\n" +
 					 "Dia: " + t.getDiaSemana() +"\n" +
 					"Numero de jugadores: " + t.getNumParticipantes() +"\n"+
-					"Juego: " + t.getJuegoAsociado().getNombre()
+					"Juego: " + t.getJuegoAsociado().getNombre() +"\n"
+
 			);
 			i += 1;
 		}
@@ -1443,19 +1473,21 @@ public class Café implements Serializable{
 		this.menú.add(cafeCaliente);
 		this.menú.add(cervezaArtesanal);
 
+		ArrayList<DayOfWeek> diasTurno1 = new ArrayList<>();
+		ArrayList<DayOfWeek> diasTurno2 = new ArrayList<>();
+		ArrayList<DayOfWeek> diasTurno3 = new ArrayList<>();
 
-		ArrayList<DayOfWeek> todosLosDias = new ArrayList<>();
-
-		int i = 1;
-
-		while (i < 7) {
-			todosLosDias.add(DayOfWeek.of(i));
-			i += 1;
+		int a = 1;
+		while (a <= 7) {
+			diasTurno1.add(DayOfWeek.of(a));
+			diasTurno2.add(DayOfWeek.of(a));
+			diasTurno3.add(DayOfWeek.of(a));
+			a += 1;
 		}
 
-		Turno turnoCompleto1 = new Turno(todosLosDias, LocalTime.of(8, 0), LocalTime.of(16, 0));
-		Turno turnoCompleto2 = new Turno(todosLosDias, LocalTime.of(12, 0), LocalTime.of(20, 0));
-		Turno turnoCocinero  = new Turno(todosLosDias, LocalTime.of(7, 0),  LocalTime.of(15, 0));
+		Turno turnoCompleto1 = new Turno(diasTurno1, LocalTime.of(8, 0), LocalTime.of(16, 0));
+		Turno turnoCompleto2 = new Turno(diasTurno2, LocalTime.of(12, 0), LocalTime.of(20, 0));
+		Turno turnoCocinero  = new Turno(diasTurno3, LocalTime.of(7, 0),  LocalTime.of(15, 0));
 
 		Mesero mesero1 = new Mesero("Carlos López", 28, 1001, new ArrayList<>(), 1234, "carlos.lopez",
 				new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), 0, 0,
@@ -1522,13 +1554,20 @@ public class Café implements Serializable{
 		Reserva reserva3 = new Reserva(this.idReservas++, LocalDate.now().plusDays(3),
 				mesa3, clienteA, 8, LocalTime.of(18, 0));
 
+		Reserva reservaHoy = new Reserva(this.idReservas++, LocalDate.now(),
+				mesa1, clienteA, 2, LocalTime.of(13, 0));
+
+
 		this.reservas.add(reserva1);
 		this.reservas.add(reserva2);
 		this.reservas.add(reserva3);
+		this.reservas.add(reservaHoy);
 
-		this.mapaReservas.computeIfAbsent(mesa1.getIdMesa(), k -> new ArrayList<>()).add(reserva1);
-		this.mapaReservas.computeIfAbsent(mesa2.getIdMesa(), k -> new ArrayList<>()).add(reserva2);
-		this.mapaReservas.computeIfAbsent(mesa3.getIdMesa(), k -> new ArrayList<>()).add(reserva3);
+		this.mapaReservas.computeIfAbsent(clienteA.getCedula(), k -> new ArrayList<>()).add(reserva1);
+		this.mapaReservas.computeIfAbsent(clienteB.getCedula(), k -> new ArrayList<>()).add(reserva2);
+		this.mapaReservas.computeIfAbsent(clienteA.getCedula(), k -> new ArrayList<>()).add(reserva3);
+		this.mapaReservas.computeIfAbsent(clienteA.getCedula(), k -> new ArrayList<>()).add(reservaHoy);
+
 
 		Item item1 = new Item(2, croissant);
 		Item item2 = new Item(1, cafeCaliente);
@@ -1563,23 +1602,23 @@ public class Café implements Serializable{
 		this.historialComprasUsuario.computeIfAbsent(clienteA.getCedula(), k -> new ArrayList<>()).add(venta3);
 		this.historialComprasUsuario.computeIfAbsent(clienteB.getCedula(), k -> new ArrayList<>()).add(venta2);
 
-		Prestamo prestamo_1 = new Prestamo(
-				LocalDate.now().minusDays(2),
-				LocalDate.now().plusDays(5),
-				prestamo1, clienteA, this.idPrestamo++
-		);
-		prestamo1.setDisponible(false);
-		clienteA.getJuegosPrestados().add(prestamo_1);
-		this.historialPrestamos.add(prestamo_1);
-
-		Prestamo prestamo_2 = new Prestamo(
-				LocalDate.now().minusDays(1),
-				LocalDate.now().plusDays(6),
-				prestamo2, clienteB, this.idPrestamo++
-		);
-		prestamo2.setDisponible(false);
-		clienteB.getJuegosPrestados().add(prestamo_2);
-		this.historialPrestamos.add(prestamo_2);
+//		Prestamo prestamo_1 = new Prestamo(
+//				LocalDate.now().minusDays(2),
+//				LocalDate.now().plusDays(5),
+//				prestamo1, clienteA, this.idPrestamo++
+//		);
+//		prestamo1.setDisponible(false);
+//		clienteA.getJuegosPrestados().add(prestamo_1);
+//		this.historialPrestamos.add(prestamo_1);
+//
+//		Prestamo prestamo_2 = new Prestamo(
+//				LocalDate.now().minusDays(1),
+//				LocalDate.now().plusDays(6),
+//				prestamo2, clienteB, this.idPrestamo++
+//		);
+//		prestamo2.setDisponible(false);
+//		clienteB.getJuegosPrestados().add(prestamo_2);
+//		this.historialPrestamos.add(prestamo_2);
 
 	}
 

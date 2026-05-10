@@ -7,6 +7,7 @@ import sujetos.Empleado;
 
 public class CambioTurno extends Solicitud implements Serializable{
 
+	private static final long serialVersionUID = 1L;
 	private Turno nuevoTurno;
 
 	public CambioTurno(int idSolicitud, LocalDate fechaSolicitud, EstadoSolicitud estado, Empleado solicitante,

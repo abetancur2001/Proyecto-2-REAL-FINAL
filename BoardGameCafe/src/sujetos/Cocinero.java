@@ -13,6 +13,8 @@ import modelo.Prestamo;
 
 public class Cocinero extends Empleado implements Serializable{
 
+	private static final long serialVersionUID = 1L;
+
 	public Cocinero(String nombre, int edad, int cedula, ArrayList<Juego> juegosFav, int password, String login,
 			ArrayList<Venta> comprasTotales, ArrayList<Prestamo> juegosPrestados, ArrayList<Alergenos> alergenos,
 			double puntosFidelidad, double descuentosDisponibles, Turno turnoAsignado) {

@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import articulos.Juego;
 
 public abstract class Usuario extends Persona{
-	
+
+	private static final long serialVersionUID = 1L;
 	private int password;
 	private String login;
 

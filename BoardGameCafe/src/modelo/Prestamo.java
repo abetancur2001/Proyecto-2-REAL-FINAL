@@ -9,7 +9,8 @@ import articulos.Juego;
 import articulos.JuegoPrestamo;
 
 public class Prestamo implements Serializable{
-	
+
+	private static final long serialVersionUID = 1L;
 	private LocalDate fechaInicioPrestamo;
 	private LocalDate fechaFinPrestamo;
 	private JuegoPrestamo juegoAPrestar;

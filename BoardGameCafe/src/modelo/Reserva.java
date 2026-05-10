@@ -7,6 +7,7 @@ import sujetos.Cliente;
 
 public class Reserva implements Serializable{
 
+	private static final long serialVersionUID = 1L;
 	private int idReserva;
 	private LocalDate fechaReserva;
 	private Mesa mesaReserva;

@@ -11,6 +11,8 @@ import modelo.Venta;
 
 public class Cliente extends UsuarioComprador implements Serializable{
 
+	private static final long serialVersionUID = 1L;
+
 	public Cliente(String nombre, int edad, int cedula, ArrayList<Juego> juegosFav, int password, String login,
 			ArrayList<Venta> comprasTotales, ArrayList<Prestamo> juegosPrestados, ArrayList<Alergenos> alergenos,
 			double puntosFidelidad, double descuentosDisponibles) {

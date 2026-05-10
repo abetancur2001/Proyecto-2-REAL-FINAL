@@ -7,7 +7,8 @@ import java.util.ArrayList;
 import sujetos.Empleado;
 
 public class Turno implements Serializable{
-	
+
+	private static final long serialVersionUID = 1L;
 	private ArrayList<DayOfWeek> dias;
 	private LocalTime horaEntrada;
 	private LocalTime horaSalida;

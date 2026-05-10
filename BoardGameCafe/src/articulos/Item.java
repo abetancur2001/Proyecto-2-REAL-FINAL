@@ -3,7 +3,7 @@ package articulos;
 import java.io.Serializable;
 
 public class Item implements Serializable{
-
+	private static final long serialVersionUID = 1L;
 	private int cantidad;
 	private Producto productoAsociado;
 	public Item(int cantidad, Producto productoAsociado) {

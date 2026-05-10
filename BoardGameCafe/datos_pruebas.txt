@@ -1,0 +1,104 @@
+========================================
+           DATOS DE PRUEBA
+========================================
+
+---------- ADMIN ----------
+Admin
+  Login:    adminPro
+  Password: 4545
+
+---------- EMPLEADOS ----------
+
+Mesero 1
+  Login:    carlos.lopez
+  Password: 1234
+
+Mesero 2
+  Login:    ana.martinez
+  Password: 5678
+
+Cocinero
+  Login:    pedro.gomez
+  Password: 9012
+
+---------- CLIENTES ----------
+
+Cliente A (mayor, alérgica al gluten, fanática de Catan)
+  Nombre:   Sofía Ramírez
+  Cédula:   2001
+  Login:    sofia.ramirez
+  Password: 1111
+
+Cliente B (menor de edad, muchos puntos)
+  Nombre:   Tomás Herrera
+  Cédula:   2002
+  Login:    tomas.herrera
+  Password: 2222
+Clientes C
+    Nombre: Andres Betancur
+    Cedula: 1013
+    Login: andres.betancur
+    Password: 2206
+
+---------- JUEGOS CATÁLOGO ----------
+
+0. Catan          - TABLERO   - TODAS_EDADES  - fácil
+1. Street Fighter - ACCION    - SOLO_ADULTOS  - fácil
+2. Mi Primer Juego- TABLERO   - APTO_5ANIOS   - fácil
+3. Twilight Imp.  - TABLERO   - TODAS_EDADES  - difícil
+4. Uno            - CARTAS    - TODAS_EDADES  - fácil
+
+---------- INVENTARIO PRÉSTAMO ----------
+
+0. Catan           - NUEVO      - disponible
+1. Street Fighter  - DESGASTADO - NO disponible (prestado a Sofía)
+2. Twilight Imp.   - DANADO     - NO disponible (prestado a Tomás)
+
+---------- INVENTARIO VENTA ----------
+
+0. Catan           - 45.000 - stock: 5
+1. Uno             - 30.000 - stock: 8
+2. Twilight Imp.   - 120.000- stock: 2
+
+---------- MENÚ ----------
+
+0. Croissant       - Pastelería - $8.000  - GLUTEN
+1. Cheesecake      - Pastelería - $10.000 - LACTEOS
+2. Café Americano  - Bebida     - $5.000  - caliente, sin alcohol
+3. Cerveza Artesanal- Bebida    - $12.000 - fría, alcohólica
+
+---------- MESAS ----------
+
+ID 10 - capacidad 2  - libre
+ID 11 - capacidad 4  - libre
+ID 12 - capacidad 10 - libre
+
+---------- TORNEOS ----------
+
+0. Torneo Amistoso Catan          - LUNES - 8 participantes
+1. Torneo Competitivo StreetFight - LUNES - 16 participantes - $20.000 entrada
+
+---------- RESERVAS ----------
+
+1. Sofía  - mesa 10 - mañana        - 14:00 - 2 personas
+2. Tomás  - mesa 11 - pasado mañana - 16:00 - 4 personas
+3. Sofía  - mesa 12 - en 3 días     - 18:00 - 8 personas
+
+---------- VENTAS (cédula 2001 = Sofía) ---------
+-
+1. hace 3 días - 2x Croissant + 1x Café Americano
+2. hoy         - 1x Croissant + 2x Cerveza Artesanal
+
+---------- VENTAS (cédula 2002 = Tomás) ----------
+
+1. ayer        - 1x Cerveza Artesanal + 1x Cheesecake
+
+---------- PRÉSTAMOS ----------
+
+1. Sofía  - Street Fighter - inicio: hace 2 días - fin: en 5 días
+2. Tomás  - Twilight Imp.  - inicio: ayer        - fin: en 6 días
+
+========================================
+  Para ventas mensuales usar: mayo 2026
+  Para ventas del día usar:   2026-05-10
+========================================

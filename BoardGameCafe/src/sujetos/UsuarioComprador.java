@@ -11,14 +11,12 @@ import articulos.JuegoPrestamo;
 
 public abstract class UsuarioComprador extends Usuario implements Serializable{
 
+	private static final long serialVersionUID = 1L;
 	protected ArrayList<Venta> comprasTotales;
 	protected ArrayList<Prestamo> juegosPrestados;
 	protected ArrayList<Alergenos> alergenos;
 	private double puntosFidelidad;
 	private double descuentosDisponibles;
-
-
-	
 
 	public UsuarioComprador(String nombre, int edad, int cedula, ArrayList<Juego> juegosFav, int password, String login,
 			ArrayList<Venta> comprasTotales, ArrayList<Prestamo> juegosPrestados, ArrayList<Alergenos> alergenos,

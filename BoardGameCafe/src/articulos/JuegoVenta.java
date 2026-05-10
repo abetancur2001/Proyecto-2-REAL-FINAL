@@ -3,7 +3,7 @@ package articulos;
 import java.io.Serializable;
 
 public class JuegoVenta extends Producto implements Serializable{
-	
+	private static final long serialVersionUID = 1L;
 	private int stock;
 	private Juego infoJuegoVenta;
 	private final double impuestoJuego = 0.19;
@@ -18,8 +18,11 @@ public class JuegoVenta extends Producto implements Serializable{
 	public Juego getInfoJuegoVenta() {
 		return infoJuegoVenta;
 	}
-	
-	
+
+	@Override
+	public String toString() {
+		return infoJuegoVenta.getNombre();
+	}
 	
 	public double getImpuestoJuego() {
 		return impuestoJuego;

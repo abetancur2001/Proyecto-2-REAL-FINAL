@@ -5,6 +5,7 @@ import modelo.Mesa;
 
 public class Juego implements Serializable{
 
+	private static final long serialVersionUID = 1L;
 	protected String nombre;
 	protected int anio;
 	protected String empresa;
@@ -65,19 +66,23 @@ public class Juego implements Serializable{
 	}
 	public boolean esCompatibleMesa(Mesa mesa) {
 
-	    if (getApto() == RestriccionEdad.APTO_5ANIOS) {
-	        return true;
-	    }
+		if (getApto() == RestriccionEdad.TODAS_EDADES) {
+			return true;
+		}
 
-	    if (getApto() == RestriccionEdad.APTO_MENORES) {
-	        return !mesa.hayPequeños();
-	    }
+		if (getApto() == RestriccionEdad.APTO_5ANIOS) {
+			return true;
+		}
 
-	    if (getApto() == RestriccionEdad.SOLO_ADULTOS) {
-	        return !mesa.hayMenores() && !mesa.hayPequeños();
-	    }
+		if (getApto() == RestriccionEdad.APTO_MENORES) {
+			return !mesa.hayPequeños();
+		}
 
-	    return false;
+		if (getApto() == RestriccionEdad.SOLO_ADULTOS) {
+			return !mesa.hayMenores() && !mesa.hayPequeños();
+		}
+
+		return false;
 	}
 	
 	

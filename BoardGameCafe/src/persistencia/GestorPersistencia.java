@@ -9,6 +9,7 @@ public class GestorPersistencia {
     private static final String RUTA = System.getProperty("user.dir") + File.separator + "cafe.dat";
 
     public void guardarCafe(Café cafe) throws IOException {
+        System.out.println("Ruta: " + RUTA);
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(RUTA))) {
             out.writeObject(cafe);
             System.out.println("Guardado en: " + RUTA);
@@ -16,6 +17,7 @@ public class GestorPersistencia {
     }
 
     public Café cargarCafe() throws IOException, ClassNotFoundException {
+        System.out.println("Ruta: " + RUTA);
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(RUTA))) {
             return (Café) in.readObject();
         }

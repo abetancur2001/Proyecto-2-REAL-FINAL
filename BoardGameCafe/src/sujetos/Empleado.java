@@ -12,7 +12,8 @@ import articulos.JuegoPrestamo;
 import modelo.Venta;
 
 public abstract class Empleado extends UsuarioComprador implements Serializable{
-	
+
+	private static final long serialVersionUID = 1L;
 	protected Turno turnoAsignado;
 
 	public Empleado(String nombre, int edad, int cedula, ArrayList<Juego> juegosFav, int password, String login,

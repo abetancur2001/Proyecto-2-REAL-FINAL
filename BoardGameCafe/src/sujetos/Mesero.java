@@ -12,7 +12,7 @@ import modelo.Venta;
 
 public class Mesero extends Empleado implements Serializable{
 	private ArrayList<Juego> listaJuegos;
-
+	private static final long serialVersionUID = 1L;
 	
 
 	public Mesero(String nombre, int edad, int cedula, ArrayList<Juego> juegosFav, int password, String login,

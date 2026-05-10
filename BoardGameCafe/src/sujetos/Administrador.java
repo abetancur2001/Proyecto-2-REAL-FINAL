@@ -11,7 +11,8 @@ import modelo.Prestamo;
 import modelo.*;
 
 public class Administrador extends Usuario implements Serializable{
-	
+
+	private static final long serialVersionUID = 1L;
 
 	public Administrador(String nombre, int edad, int cedula, ArrayList<Juego> juegosFav, int password, String login) {
 		super(nombre, edad, cedula, juegosFav, password, login);

@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import sujetos.Empleado;
 
 public class IntercambioTurno extends Solicitud implements Serializable{
-	
+	private static final long serialVersionUID = 1L;
 	private Empleado empleadoIntercambio;
 
 	public IntercambioTurno(int idSolicitud, LocalDate fechaSolicitud, EstadoSolicitud estado, Empleado solicitante,

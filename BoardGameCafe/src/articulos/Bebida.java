@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import sujetos.Cocinero;
 
 public class Bebida extends Platillos implements Serializable{
+	private static final long serialVersionUID = 1L;
 	private Boolean alcoholica;
 	private Boolean esCaliente;
 	

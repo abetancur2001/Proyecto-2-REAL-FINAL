@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Mesa implements Serializable{
+	private static final long serialVersionUID = 1L;
 	private Boolean tieneBebidadCalientes;
 	private int idMesa;
 	private ArrayList<Cliente> personasSentadas;

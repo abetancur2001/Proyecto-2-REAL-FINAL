@@ -10,7 +10,7 @@ public abstract class Persona implements Serializable{
 	private int edad;
 	private int cedula;
 	private ArrayList<Juego> juegosFav;
-
+	private static final long serialVersionUID = 1L;
 	
 	public String getNombre() {
 		return nombre;

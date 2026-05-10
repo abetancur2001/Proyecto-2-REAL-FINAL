@@ -5,6 +5,7 @@ import com.sun.security.jgss.AuthorizationDataEntry;
 import exceptions.*;
 import modelo.*;
 import persistencia.GestorPersistencia;
+import sujetos.Administrador;
 import sujetos.Cliente;
 import sujetos.Empleado;
 import sujetos.UsuarioComprador;
@@ -32,7 +33,8 @@ public class ClienteConsola {
             System.out.println("Datos cargados");
         } catch (Exception e){
             System.out.println("No se encontró cafe, creando uno nuevo...");
-            cafe = new Café(50, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new HashMap<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new HashMap<>(), new HashMap<>(), new ArrayList<Juego>(), null, new HashMap<>(), 1,1, 9, 1, 0);
+            Administrador admin = new Administrador("Admin", 30, 9999, new ArrayList<>(), 4545, "adminPro");
+            cafe = new Café(50, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new HashMap<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new HashMap<>(), new HashMap<>(), new ArrayList<Juego>(), admin, new HashMap<>(), 1, 1, 9, 1, 0);
         }
         cafe.inicializarDatos();
 
@@ -167,7 +169,7 @@ public class ClienteConsola {
 
         cafe.addCliente(cli);
         cliente = cli;
-        System.out.println("Cuenta creada exitosamente!");
+        System.out.println("Cuenta creada exitosamente");
 
 
     }
@@ -244,6 +246,7 @@ public class ClienteConsola {
 
         try {
             res = cafe.crearReserva(fechaRes, cliente, cant, horaRes);
+            res.getMesaReserva().getPersonasSentadas().add(cliente);
         }catch (CapacidadExcedidaException e){
             System.out.println("No hay capacidad para la reserva");
             return;
@@ -259,10 +262,14 @@ public class ClienteConsola {
             int edadA = sc.nextInt();
             System.out.println("Ingrese el número de cedula del acompañante " + i + " : ");
             int cedulaA = sc.nextInt();
-            Cliente clin = new Cliente(nombreA, edadA, cedulaA, null, 0, null, null, null, null, 0.0, 0.0);
+            Cliente clin = new Cliente(nombreA, edadA, cedulaA, new ArrayList<>(), 0, null,
+                    new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), 0.0, 0.0);
             res.getMesaReserva().getPersonasSentadas().add(clin);
             i += 1;
         }
+
+        System.out.println("Reserva creada exitosamente");
+
 
     }
 
@@ -272,7 +279,7 @@ public class ClienteConsola {
         boolean dispo = false;
         Mesa m = null;
 
-        if(cafe.getMapaReservas().get(cliente.getCedula()) == null || cafe.getMapaReservas().get(cliente.getCedula()).size() == 0){
+        if(cafe.getMapaReservas().get(cliente.getCedula()) == null ||  cafe.getMapaReservas().get(cliente.getCedula()).size() == 0){
             throw new MostrarException("El cliente no tiene reservas activas");
         }
 
@@ -284,7 +291,6 @@ public class ClienteConsola {
                     break;
                 }
             }
-
         }
 
         if(!dispo){
@@ -311,6 +317,7 @@ public class ClienteConsola {
 
 
         cafe.crearPrestamo(LocalDate.now(), fechaEnt, cafe.getCatalogoJuegos().get(opcionJ), cliente, cafe.getIdPrestamo(), m);
+        System.out.println("Prestamo creado exitosamente");
 
     }
 
@@ -318,6 +325,11 @@ public class ClienteConsola {
 
         boolean dispo = false;
         Mesa m = null;
+
+        if(cafe.getMapaReservas().get(cliente.getCedula()) == null ||
+                cafe.getMapaReservas().get(cliente.getCedula()).size() == 0){
+            throw new MostrarException("El cliente no tiene reservas activas");
+        }
 
         if(cafe.getMapaReservas().get(cliente.getCedula()).size() > 0){
             for(Reserva res : cafe.getMapaReservas().get(cliente.getCedula())){
@@ -452,6 +464,7 @@ public class ClienteConsola {
             }
             try{
                 cafe.crearVenta(items, cliente, LocalDate.now(),m,opcionPun, opcionCod);
+                System.out.println("Venta exitosa");
             } catch (VentaNoPermitidaException e){
                 System.out.println(e.getMessage());
             }
