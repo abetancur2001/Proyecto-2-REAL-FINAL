@@ -9,6 +9,9 @@ import modelo.*;
 import persistencia.GestorPersistencia;
 import sujetos.Empleado;
 import sujetos.*;
+import torneos.Amistoso;
+import torneos.Competitivo;
+import torneos.Torneo;
 
 import java.io.IOException;
 import java.time.DayOfWeek;
@@ -32,8 +35,8 @@ public class AdminConsola {
         } catch (Exception e){
             System.out.println("No se encontró cafe, creando uno nuevo...");
             cafe = new Café(50, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new HashMap<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new HashMap<>(), new HashMap<>(), new ArrayList<Juego>(), null,new HashMap<>(), 1,1, 9, 1, 0);
-            cafe.inicializarDatos();
         }
+        cafe.inicializarDatos();
 
         System.out.println("----- LOGIN ADMIN -----");
         System.out.println("Usuario: ");
@@ -97,6 +100,9 @@ public class AdminConsola {
                     case 16:
                         crearTorneo();
                         break;
+                    case 17:
+                        darPremioTorneo();
+                        break;
                     case 0:
                     exit = true;
                     break;
@@ -113,6 +119,59 @@ public class AdminConsola {
         }
         else{
             throw new AutenticacionException("Acceso Denegado. Vuelva a Ingresar sus datos");
+        }
+
+    }
+
+    private static void darPremioTorneo(){
+
+        try{
+            System.out.println("Ingrese el login del usuario que hizo la inscripción: ");
+            String login = sc.next();
+            UsuarioComprador u = null;
+
+            UsuarioComprador uc = cafe.getMapaClientes().get(login);
+
+            if(uc == null){
+                uc = cafe.getMapaEmpleados().get(login);
+            }
+            if(uc == null){
+                throw new AutenticacionException("Usuario no encontrado");
+            }
+
+
+
+            cafe.mostrarTorneos();
+            System.out.println("Ingrese una opcion de torneo: ");
+            int opcionT = sc.nextInt();
+            Torneo t = cafe.getTorneos().get(opcionT);
+
+            ArrayList<UsuarioComprador> participantes = t.getInscripciones().get(uc.getCedula());
+
+            if(participantes != null){
+                System.out.println("El grupo de participantes inscritos en el torneo es: ");
+                int i = 0;
+                for(UsuarioComprador ucc : participantes){
+                    System.out.println(
+                            "Opcion: " + i + "\n" +
+                            "Nombre: " + ucc.getNombre() + "\n" +
+                             "Cedula: " + ucc.getCedula()
+                    );
+                }
+                System.out.println("Ingrese el numero de la opcion del grupo de participantes que desea dar premio: ");
+                int opcionU = sc.nextInt();
+                u = participantes.get(opcionU);
+
+            }
+
+            if(t instanceof Amistoso){
+                t.darPremioDescuento(u);
+            }
+            else if(t instanceof Competitivo){
+                t.darPremioDinero(u);
+            }
+        } catch (Exception e){
+            System.out.println("Error al dar premio: " + e.getMessage());
         }
 
     }
@@ -135,6 +194,7 @@ public class AdminConsola {
         System.out.println("14. Modificar Turno");
         System.out.println("15. Marcar Desaparecido Juego");
         System.out.println("16. Crear Torneo");
+        System.out.println("17. Dar Premio Torneo");
         System.out.println("0. Salir y Guardar");
     }
 

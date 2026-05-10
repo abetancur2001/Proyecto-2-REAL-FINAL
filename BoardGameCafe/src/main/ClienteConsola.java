@@ -33,8 +33,8 @@ public class ClienteConsola {
         } catch (Exception e){
             System.out.println("No se encontró cafe, creando uno nuevo...");
             cafe = new Café(50, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new HashMap<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new HashMap<>(), new HashMap<>(), new ArrayList<Juego>(), null, new HashMap<>(), 1,1, 9, 1, 0);
-            cafe.inicializarDatos();
         }
+        cafe.inicializarDatos();
 
         boolean salir = false;
         boolean auten = false;
@@ -361,7 +361,7 @@ public class ClienteConsola {
 
     }
 
-    private static ArrayList<Item> comprarJuegos(){
+    public static ArrayList<Item> comprarJuegos(){
 
         ArrayList<Item> s = new ArrayList<>();
 
@@ -390,7 +390,7 @@ public class ClienteConsola {
         return s;
     }
 
-    private static ArrayList<Item> comprarPlatillos(){
+    public static ArrayList<Item> comprarPlatillos(){
 
         ArrayList<Item> p = new ArrayList<>();
 
@@ -419,7 +419,7 @@ public class ClienteConsola {
         }
 
 
-    private static void verVentaTotal(ArrayList<Item> items){
+    public static void verVentaTotal(ArrayList<Item> items){
         System.out.println("----- VER TOTAL VENTA -----");
 
         if(items.isEmpty()){
@@ -459,7 +459,7 @@ public class ClienteConsola {
 
     }
 
-    private static void mostrarProductos(ArrayList<Item> items){
+    public static void mostrarProductos(ArrayList<Item> items){
 
         for(Item i: items){
             String nom = "";
@@ -487,6 +487,7 @@ public class ClienteConsola {
         System.out.println("----- INSCRIBIRSE AL TORNEO -----");
 
         ArrayList<UsuarioComprador> usuarios = new ArrayList<>();
+        usuarios.add(cliente);
 
         if (cafe.getTorneos().isEmpty()) {
             throw new TorneosException("No hay torneos disponibles");
@@ -502,36 +503,41 @@ public class ClienteConsola {
         System.out.println("Ingrese la cantidad de usuarios que desea inscribir: ");
         int cantUs = sc.nextInt();
 
-        int i = 0;
-        while(i<cantUs){
-            System.out.println("Es cliente o Empleado? (1. Cliente 2. Empleado): )");
-            int tipo = sc.nextInt();
+        if(cantUs <= 2){
+            int i = 0;
+            while(i<cantUs){
+                System.out.println("Es cliente o Empleado? (1. Cliente 2. Empleado): )");
+                int tipo = sc.nextInt();
 
-            if(tipo == 1){
-                System.out.println("Ingrese el login del cliente: )");
-                String login = sc.next();
-                Cliente u = cafe.getMapaClientes().get(login);
+                if(tipo == 1){
+                    System.out.println("Ingrese el login del cliente: )");
+                    String login = sc.next();
+                    Cliente u = cafe.getMapaClientes().get(login);
 
-                if(u == null){
-                    throw new TorneosException("El cliente no existe");
+                    if(u == null){
+                        throw new TorneosException("El cliente no existe");
+                    }
+
+                    usuarios.add(u);
                 }
+                else if(tipo == 2){
+                    System.out.println("Ingrese el login del empleado: )");
+                    String login = sc.next();
+                    Empleado u = cafe.getMapaEmpleados().get(login);
 
-                usuarios.add(u);
-            }
-            else if(tipo == 2){
-                System.out.println("Ingrese el login del empleado: )");
-                String login = sc.next();
-                Empleado u = cafe.getMapaEmpleados().get(login);
+                    if (u == null) {
+                        throw new TorneosException("El empleado no existe");
+                    }
 
-                if (u == null) {
-                    throw new TorneosException("El empleado no existe");
+                    usuarios.add(u);
                 }
-
-                usuarios.add(u);
+                i += 1;
             }
-            i += 1;
         }
-
+        else{
+            System.out.println("La cantidad de usuarios debe ser menor o igual a 2");
+            return;
+        }
         Torneo t = cafe.getTorneos().get(opcionT);
 
         t.inscribir(cliente,usuarios);
@@ -622,7 +628,7 @@ public class ClienteConsola {
 
 
 
-    private static void mostrarMenuProductos(){
+    public static void mostrarMenuProductos(){
         System.out.println("----- MENU PRODUCTOS -----");
         System.out.println("1. Juegos");
         System.out.println("2. Platillos");

@@ -473,7 +473,7 @@ public class Café implements Serializable{
 
 		if (ventaAux.hayAlergenoEnVenta(mesa) != null) {
 
-			throw new VentaNoPermitidaException("ADVERTANCIA: hay una persona alergica en la mesa a "+ ventaAux.hayAlergenoEnVenta(mesa));
+			System.out.println("ADVERTANCIA: hay una persona alergica en la mesa a "+ ventaAux.hayAlergenoEnVenta(mesa));
 
 		}
 
@@ -709,7 +709,6 @@ public class Café implements Serializable{
 			this.setIdSolicitud(getIdSolicitud() + 1);
 			solicitudes.add(ct);
 			return ct;
-			
 		}
 		
 		public IntercambioTurno crearIntercambioTurno(Empleado empS, Empleado empI) {
@@ -724,6 +723,12 @@ public class Café implements Serializable{
 		}
 
 	public void revisarJuegos(){
+
+		if(historialPrestamos.isEmpty()){
+			System.out.println("No hay juegos prestados");
+			return;
+		}
+
 		for (Prestamo p:getHistorialPrestamos()) {
 			System.out.println(
 					p.getJuegoAPrestar().getInfoJuego().getNombre() + "\n"
@@ -1074,7 +1079,7 @@ public class Café implements Serializable{
 
 		if(venta == null || venta.isEmpty()){
 			System.out.println("No hay ventas para la cedula ingresada");
-
+			return;
 		}
 
 			for(Venta v : venta){
@@ -1380,19 +1385,203 @@ public class Café implements Serializable{
 
 
 
-		public void inicializarDatos(){
-			if(admin == null){
-				admin = new Administrador("Andres", 34, 123456, new ArrayList<Juego>(), 4545, "adminPro" );
-			}
+	public void inicializarDatos() {
+		if (!this.catalogoJuegos.isEmpty()) return;
 
-			if (mesas.size() == 0 ){
-				Mesa mesa1 = new Mesa(false, 1, new ArrayList<Cliente>(), false, 4);
-				Mesa mesa2 = new Mesa(false, 2, new ArrayList<Cliente>(), false, 4);
-				mesas.add(mesa1);
-				mesas.add(mesa2);
+		Juego juego1 = new Juego("Catan", 1995, "Kosmos", 4, false,
+				RestriccionEdad.TODAS_EDADES, TiposJuegos.TABLERO);
 
-			}
+		Juego juego2 = new Juego("Street Fighter", 2020, "Capcom", 4, false,
+				RestriccionEdad.SOLO_ADULTOS, TiposJuegos.ACCION);
+
+		Juego juego3 = new Juego("Mi Primer Juego", 2018, "Ravensburger", 2, false,
+				RestriccionEdad.APTO_5ANIOS, TiposJuegos.TABLERO);
+
+		Juego juego4 = new Juego("Twilight Imperium", 2017, "FFG", 6, true,
+				RestriccionEdad.TODAS_EDADES, TiposJuegos.TABLERO);
+
+		Juego juego5 = new Juego("Uno", 1971, "Mattel", 6, false,
+				RestriccionEdad.TODAS_EDADES, TiposJuegos.CARTAS);
+
+		this.catalogoJuegos.add(juego1);
+		this.catalogoJuegos.add(juego2);
+		this.catalogoJuegos.add(juego3);
+		this.catalogoJuegos.add(juego4);
+		this.catalogoJuegos.add(juego5);
+
+		JuegoPrestamo prestamo1 = new JuegoPrestamo(true, false, EstadoJuego.NUEVO, juego1, 0);
+		JuegoPrestamo prestamo2 = new JuegoPrestamo(true, false, EstadoJuego.DESGASTADO, juego2, 3);
+		JuegoPrestamo prestamo3 = new JuegoPrestamo(false, false, EstadoJuego.DANADO, juego4, 10);
+
+		this.inventarioJuegosPrestamo.add(prestamo1);
+		this.inventarioJuegosPrestamo.add(prestamo2);
+		this.inventarioJuegosPrestamo.add(prestamo3);
+
+		JuegoVenta Jventa1 = new JuegoVenta(45000, 5, juego1);
+		JuegoVenta Jventa2 = new JuegoVenta(30000, 8, juego5);
+		JuegoVenta Jventa3 = new JuegoVenta(120000, 2, juego4);
+
+		this.inventarioJuegosVenta.add(Jventa1);
+		this.inventarioJuegosVenta.add(Jventa2);
+		this.inventarioJuegosVenta.add(Jventa3);
+
+		ArrayList<Alergenos> alergenosGluten = new ArrayList<>();
+		alergenosGluten.add(Alergenos.GLUTEN);
+
+		ArrayList<Alergenos> alergenosLacteos = new ArrayList<>();
+		alergenosLacteos.add(Alergenos.LACTEOS);
+
+		ArrayList<Alergenos> sinAlergenos = new ArrayList<>();
+
+		Pasteleria croissant = new Pasteleria(8000, "Croissant", alergenosGluten);
+		Pasteleria cheesecake = new Pasteleria(10000, "Cheesecake", alergenosLacteos);
+		Bebida cafeCaliente = new Bebida(5000, "Café Americano", sinAlergenos, false, true);
+		Bebida cervezaArtesanal = new Bebida(12000, "Cerveza Artesanal", sinAlergenos, true, false);
+
+		this.menú.add(croissant);
+		this.menú.add(cheesecake);
+		this.menú.add(cafeCaliente);
+		this.menú.add(cervezaArtesanal);
+
+
+		ArrayList<DayOfWeek> todosLosDias = new ArrayList<>();
+
+		int i = 1;
+
+		while (i < 7) {
+			todosLosDias.add(DayOfWeek.of(i));
+			i += 1;
 		}
+
+		Turno turnoCompleto1 = new Turno(todosLosDias, LocalTime.of(8, 0), LocalTime.of(16, 0));
+		Turno turnoCompleto2 = new Turno(todosLosDias, LocalTime.of(12, 0), LocalTime.of(20, 0));
+		Turno turnoCocinero  = new Turno(todosLosDias, LocalTime.of(7, 0),  LocalTime.of(15, 0));
+
+		Mesero mesero1 = new Mesero("Carlos López", 28, 1001, new ArrayList<>(), 1234, "carlos.lopez",
+				new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), 0, 0,
+				turnoCompleto1, new ArrayList<>());
+
+		Mesero mesero2 = new Mesero("Ana Martínez", 25, 1002, new ArrayList<>(), 5678, "ana.martinez",
+				new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), 0, 0,
+				turnoCompleto2, new ArrayList<>());
+
+		Cocinero cocinero1 = new Cocinero("Pedro Gómez", 35, 1003, new ArrayList<>(), 9012, "pedro.gomez",
+				new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), 0, 0,
+				turnoCocinero);
+
+		this.empleados.add(mesero1);
+		this.empleados.add(mesero2);
+		this.empleados.add(cocinero1);
+		this.mapaEmpleados.put(mesero1.getLogin(), mesero1);
+		this.mapaEmpleados.put(mesero2.getLogin(), mesero2);
+		this.mapaEmpleados.put(cocinero1.getLogin(), cocinero1);
+
+		ArrayList<Juego> favsClienteA = new ArrayList<>();
+		favsClienteA.add(juego1);
+
+		ArrayList<Alergenos> alergenosClienteA = new ArrayList<>();
+		alergenosClienteA.add(Alergenos.GLUTEN);
+
+		Cliente clienteA = new Cliente("Sofía Ramírez", 22, 2001, favsClienteA, 1111, "sofia.ramirez",
+				new ArrayList<>(), new ArrayList<>(), alergenosClienteA, 150.0, 0.0);
+
+		Cliente clienteB = new Cliente("Tomás Herrera", 16, 2002, new ArrayList<>(), 2222, "tomas.herrera",
+				new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), 9999.0, 50.0);
+
+		this.clientes.add(clienteA);
+		this.clientes.add(clienteB);
+		this.usuarios.add(clienteA);
+		this.usuarios.add(clienteB);
+		this.mapaClientes.put(clienteA.getLogin(), clienteA);
+		this.mapaClientes.put(clienteB.getLogin(), clienteB);
+
+		Mesa mesa1 = new Mesa(false, 10, new ArrayList<>(), false, 2);
+		Mesa mesa2 = new Mesa(false, 11, new ArrayList<>(), false, 4);
+		Mesa mesa3 = new Mesa(false, 12, new ArrayList<>(), false, 10);
+
+		this.mesas.add(mesa1);
+		this.mesas.add(mesa2);
+		this.mesas.add(mesa3);
+
+		Amistoso torneoAmistoso = new Amistoso(this.idTorneos +=1 , "Torneo Amistoso Catan",
+				DayOfWeek.MONDAY, 8, juego1, new HashMap<>());
+
+		Competitivo torneoCompetitivo = new Competitivo(this.idTorneos += 1, "Torneo Competitivo Street Fighter",
+				DayOfWeek.MONDAY, 16, juego2, new HashMap<>(), 20000.0);
+
+		this.torneos.add(torneoAmistoso);
+		this.torneos.add(torneoCompetitivo);
+
+
+		Reserva reserva1 = new Reserva(this.idReservas++, LocalDate.now().plusDays(1),
+				mesa1, clienteA, 2, LocalTime.of(14, 0));
+
+		Reserva reserva2 = new Reserva(this.idReservas++, LocalDate.now().plusDays(2),
+				mesa2, clienteB, 4, LocalTime.of(16, 0));
+
+		Reserva reserva3 = new Reserva(this.idReservas++, LocalDate.now().plusDays(3),
+				mesa3, clienteA, 8, LocalTime.of(18, 0));
+
+		this.reservas.add(reserva1);
+		this.reservas.add(reserva2);
+		this.reservas.add(reserva3);
+
+		this.mapaReservas.computeIfAbsent(mesa1.getIdMesa(), k -> new ArrayList<>()).add(reserva1);
+		this.mapaReservas.computeIfAbsent(mesa2.getIdMesa(), k -> new ArrayList<>()).add(reserva2);
+		this.mapaReservas.computeIfAbsent(mesa3.getIdMesa(), k -> new ArrayList<>()).add(reserva3);
+
+		Item item1 = new Item(2, croissant);
+		Item item2 = new Item(1, cafeCaliente);
+		Item item3 = new Item(1, cervezaArtesanal);
+		Item item4 = new Item(1, cheesecake);
+
+		ArrayList<Item> itemsVenta1 = new ArrayList<>();
+		itemsVenta1.add(item1);
+		itemsVenta1.add(item2);
+
+		ArrayList<Item> itemsVenta2 = new ArrayList<>();
+		itemsVenta2.add(item3);
+		itemsVenta2.add(item4);
+
+		ArrayList<Item> itemsVenta3 = new ArrayList<>();
+		itemsVenta3.add(new Item(1, croissant));
+		itemsVenta3.add(new Item(2, cervezaArtesanal));
+
+		Venta venta1 = new Venta(itemsVenta1, clienteA, LocalDate.now().minusDays(3));
+		Venta venta2 = new Venta(itemsVenta2, clienteB, LocalDate.now().minusDays(1));
+		Venta venta3 = new Venta(itemsVenta3, clienteA, LocalDate.now());
+
+		venta1.calculoCuenta(false, false);
+		venta2.calculoCuenta(false, false);
+		venta3.calculoCuenta(false, false);
+
+		this.historialVentas.add(venta1);
+		this.historialVentas.add(venta2);
+		this.historialVentas.add(venta3);
+
+		this.historialComprasUsuario.computeIfAbsent(clienteA.getCedula(), k -> new ArrayList<>()).add(venta1);
+		this.historialComprasUsuario.computeIfAbsent(clienteA.getCedula(), k -> new ArrayList<>()).add(venta3);
+		this.historialComprasUsuario.computeIfAbsent(clienteB.getCedula(), k -> new ArrayList<>()).add(venta2);
+
+		Prestamo prestamo_1 = new Prestamo(
+				LocalDate.now().minusDays(2),
+				LocalDate.now().plusDays(5),
+				prestamo1, clienteA, this.idPrestamo++
+		);
+		prestamo1.setDisponible(false);
+		clienteA.getJuegosPrestados().add(prestamo_1);
+		this.historialPrestamos.add(prestamo_1);
+
+		Prestamo prestamo_2 = new Prestamo(
+				LocalDate.now().minusDays(1),
+				LocalDate.now().plusDays(6),
+				prestamo2, clienteB, this.idPrestamo++
+		);
+		prestamo2.setDisponible(false);
+		clienteB.getJuegosPrestados().add(prestamo_2);
+		this.historialPrestamos.add(prestamo_2);
+
+	}
 
 	}
 

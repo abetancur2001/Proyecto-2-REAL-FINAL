@@ -39,8 +39,11 @@ public abstract class Platillos extends Producto implements Serializable{
 		this.nombrePlatillo = nombrePlatillo;
 		Alergenos = alergenos;
 	}
-	
-	
+
+	@Override
+	public String toString() {
+		return nombrePlatillo;
+	}
 	
 	
 

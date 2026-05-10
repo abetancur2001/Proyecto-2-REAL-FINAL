@@ -4,6 +4,7 @@ import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import sujetos.Cliente;
 import sujetos.Empleado;
 import sujetos.UsuarioComprador;
 import articulos.*;
@@ -17,6 +18,7 @@ public abstract class Torneo {
 	private int numParticipantes;
 	private Juego juegoAsociado;
 	private HashMap<Integer, ArrayList<UsuarioComprador>> inscripciones;
+
 
 	public int getIdTorneo() {
 		return idTorneo;
@@ -145,8 +147,7 @@ public abstract class Torneo {
 		ArrayList<UsuarioComprador> lista = inscripciones.get(participante.getCedula());
 		int numFan = (int) Math.ceil(numParticipantes * 0.2);
 		int numNormal = numParticipantes - numFan;
-		
-		
+
 
 		if (lista == null) {
 			if (participantes.size() > 3) {
@@ -174,12 +175,22 @@ public abstract class Torneo {
 
 		for (UsuarioComprador uc : participantes) {
 
+			if(this instanceof Competitivo){
+				double taf = ((Competitivo) this).getTarifaEntrada();
+				if(uc.getPuntosFidelidad() < taf){
+					throw new TorneosException("El usuario no tiene saldo suficiente");
+				}
+				if(uc instanceof Cliente){
+					uc.setPuntosFidelidad(uc.getPuntosFidelidad() - taf);
+				}
+
+			}
 			if (esFan(uc)) {
 
 				if (getNumFansActuales() + fansTemp < numFan) {
-					fansTemp++;
+					fansTemp += 1 ;
 				} else if (getNumNormales() + normalTemp < numNormal) {
-					normalTemp++;
+					normalTemp += 1;
 				} else {
 					throw new TorneosException("No hay cupos para fans");
 				}
@@ -206,15 +217,11 @@ public abstract class Torneo {
 		inscripciones.remove(participante.getCedula());
 	}
 	
-	public void darPremioDescuento(ArrayList<UsuarioComprador> participantes) {
-		
-		for (UsuarioComprador uc : participantes) {
-			uc.setDescuentosDisponibles(0.15);
-		}
-		
+	public void darPremioDescuento(UsuarioComprador participante) {
+		participante.setDescuentosDisponibles(0.15);
 	}
 	
-	public void darPremioDinero(ArrayList<UsuarioComprador> participantes) {
+	public void darPremioDinero(UsuarioComprador participante) {
 		
 		double din = 0.0;
 		
@@ -222,11 +229,13 @@ public abstract class Torneo {
 			Competitivo com = (Competitivo) this;
 			din = getNumTotalParticipantesActuales() * com.getTarifaEntrada();
 		}
-		
-		for (UsuarioComprador uc : participantes) {
-			uc.setPuntosFidelidad(uc.getPuntosFidelidad() + din);
+
+		if(participante instanceof Empleado){
+			throw new TorneosException("Los empleados no pueden ganar dinero");
 		}
-		
+
+		participante.setPuntosFidelidad(participante.getPuntosFidelidad() + din);
+
 	}
 
 
