@@ -221,6 +221,7 @@ public abstract class Torneo implements Serializable {
 	
 	public void darPremioDescuento(UsuarioComprador participante) {
 		participante.setDescuentosDisponibles(0.15);
+		inscripciones.clear();
 	}
 	
 	public void darPremioDinero(UsuarioComprador participante) {
@@ -237,7 +238,7 @@ public abstract class Torneo implements Serializable {
 		}
 
 		participante.setPuntosFidelidad(participante.getPuntosFidelidad() + din);
-
+		inscripciones.clear();
 	}
 
 

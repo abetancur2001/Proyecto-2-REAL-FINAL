@@ -11,11 +11,13 @@ import sujetos.*;
 import torneos.Torneo;
 
 import java.io.IOException;
+import java.time.DateTimeException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 import static main.ClienteConsola.*;
@@ -44,7 +46,7 @@ public class EmpleadoConsola {
         boolean auten = false;
         while(!salir){
             mostrarMenuInicial();
-            int opcionI = sc.nextInt();
+            int opcionI = leerInt("");
             switch (opcionI){
                 case 1:
                     crearCuenta();
@@ -67,7 +69,7 @@ public class EmpleadoConsola {
             boolean exit = false;
             while(!exit){
                 mostrarMenuPrincipal();
-                int opcionP = sc.nextInt();
+                int opcionP = leerInt("");
                 switch (opcionP){
 
                     case 1:
@@ -91,6 +93,9 @@ public class EmpleadoConsola {
                     case 7:
                         solicitarIntercambioTurno();
                         break;
+                    case 8:
+                        solicitarPrestamo();
+                        break;
                     case 0:
                         exit = true;
                         break;
@@ -105,6 +110,30 @@ public class EmpleadoConsola {
 
     }
 
+    private static void solicitarPrestamo(){
+        System.out.println("----- SOLICITAR PRESTAMO -----");
+
+        cafe.mostrarCatalogoJuegos();
+        int opcionJ = leerInt("Ingrese el numero del juego: ");
+        System.out.println("Ingrese el dia de la entrega del juego: ");
+        int diaEnt = leerIntRango("Dia: ", 1, 31);
+        int mesEnt = leerIntRango("Mes: ", 1, 12);
+        int anioEnt = leerIntRango("Anio: ", LocalDate.now().getYear(), LocalDate.now().getYear() + 1);
+
+        LocalDate fechaEnt = null;
+        try{
+            fechaEnt = LocalDate.of(anioEnt, mesEnt, diaEnt);
+        }catch(DateTimeException e){
+            System.out.println("Fecha invalida");
+            return;
+        }
+
+
+        cafe.crearPrestamo(LocalDate.now(), fechaEnt, cafe.getCatalogoJuegos().get(opcionJ), empleado, cafe.getIdPrestamo(), new Mesa(false, 10000, new ArrayList<>(), true, 0));
+        System.out.println("Prestamo creado exitosamente");
+
+    }
+
     private static void comprarProducto(){
         ArrayList<Item> items = new ArrayList<Item>();
 
@@ -112,8 +141,7 @@ public class EmpleadoConsola {
 
         while(!salir){
             ClienteConsola.mostrarMenuProductos();
-            System.out.println("Ingrese una opcion: ");
-            int opcionP = sc.nextInt();
+            int opcionP = leerInt("Ingrese una opcion: ");
             switch(opcionP){
                 case 1:
                     items.addAll(comprarJuegos());
@@ -142,12 +170,9 @@ public class EmpleadoConsola {
 
         System.out.println("Los productos actualmente seleccionados son: ");
         mostrarProductos(items);
-        System.out.println("Confirme si esta correcto (1. SI 2. NO): ");
-        int conf = sc.nextInt();
-        System.out.println("¿Desea usar puntos? (1. SI 2. NO): ");
-        boolean opcionPun = (sc.nextInt() == 1);
-        System.out.println("¿Desea usar codigo descuento? (1. SI 2. NO): ");
-        boolean opcionCod = (sc.nextInt() == 1);
+        int conf = leerInt("Confirme si esta correcto (1. SI 2. NO): ");
+        boolean opcionPun = (leerInt("¿Desea usar puntos? (1. SI 2. NO): ") == 1);
+        boolean opcionCod = (leerInt("¿Desea usar codigo descuento? (1. SI 2. NO): ") == 1);
 
         if(conf == 2){
             return;
@@ -164,10 +189,8 @@ public class EmpleadoConsola {
     private static boolean iniciarSesion(){
 
         System.out.println("----- LOGIN EMPLEADO -----");
-        System.out.println("Usuario: ");
-        String login = sc.next();
-        System.out.println("Clave: ");
-        int pass = sc.nextInt();
+        String login = leerString("Usuario: ");
+        int pass = leerInt("Clave: ");
 
         if(cafe.autenticarEmpleado(login, pass)== null){
             throw new AutenticacionException("Usuario no encontrado");
@@ -205,11 +228,10 @@ public class EmpleadoConsola {
 
 
         System.out.println("Ingrese la opcion del torneo que desea desinscribirse: ");
-        int opcionT = sc.nextInt();
+        int opcionT = leerIntRango("Ingrese la opcion del torneo que desea desinscribirse: ", 0, tor.size()-1);
         torn = tor.get(opcionT);
 
-        System.out.println("¿Desea desinscribirse de torneo? (1. SI 2. NO): ");
-        int opcionD = sc.nextInt();
+        int opcionD = leerIntRango("¿Desea desinscribirse de torneo? (1. SI 2. NO): ", 1, 2);
 
         if (opcionD == 1) {
             try{
@@ -240,24 +262,20 @@ public class EmpleadoConsola {
         }
 
         cafe.mostrarTorneos();
-        System.out.println("Ingrese la opcion del torneo que desea inscribirse: ");
-        int opcionT = sc.nextInt();
+        int opcionT = leerIntRango("Ingrese la opcion del torneo que desea inscribirse: ", 0, cafe.getTorneos().size()-1);
         if(opcionT < 0 || opcionT >= cafe.getTorneos().size()){
             throw new TorneosException("Opcion invalida");
         }
 
-        System.out.println("Ingrese la cantidad de usuarios que desea inscribir: ");
-        int cantUs = sc.nextInt();
+        int cantUs = leerInt("Ingrese la cantidad de usuarios que desea inscribir: ");
 
         if(cantUs <= 2){
             int i = 0;
             while(i<cantUs){
-                System.out.println("Es cliente o Empleado? (1. Cliente 2. Empleado): )");
-                int tipo = sc.nextInt();
+                int tipo = leerIntRango("Ingrese la opcion del tipo de usuario: ", 1, 2);
 
                 if(tipo == 1){
-                    System.out.println("Ingrese el login del cliente: )");
-                    String login = sc.next();
+                    String login = leerString("Ingrese el login del cliente: )");
                     Cliente u = cafe.getMapaClientes().get(login);
 
                     if(u == null){
@@ -267,8 +285,7 @@ public class EmpleadoConsola {
                     usuarios.add(u);
                 }
                 else if(tipo == 2){
-                    System.out.println("Ingrese el login del empleado: )");
-                    String login = sc.next();
+                    String login = leerString("Ingrese el login del empleado: )");
                     Empleado u = cafe.getMapaEmpleados().get(login);
 
                     if (u == null) {
@@ -294,8 +311,7 @@ public class EmpleadoConsola {
         System.out.println("----- SOLICITAR INTERCAMBIO DE TURNO -----");
         Empleado empI = null;
 
-        System.out.println("Ingrese el login del empleado que desea intercambiar: ");
-        String login = sc.nextLine();
+        String login = leerString("Ingrese el login del empleado que desea intercambiar: ");
 
         try{
             empI = cafe.getMapaEmpleados().get(login);
@@ -317,15 +333,12 @@ public class EmpleadoConsola {
         sc.nextLine();
 
         System.out.println("Ingrese tipo de Platillo (1. Bebida 2. Pasteleria): " );
-        int opcionPla = sc.nextInt();
+        int opcionPla = leerIntRango("Ingrese tipo de Platillo (1. Bebida 2. Pasteleria): ", 1, 2);
 
-        System.out.println("Ingrese el precio de venta: " );
-        int precio = sc.nextInt();
+        int precio = leerInt("Ingrese el precio de venta: ");
         sc.nextLine();
-        System.out.println("Ingrese el nombre del Platillo: " );
-        String nom = sc.nextLine();
-        System.out.println("Cantidad de alergenos (int): " );
-        int cantA = sc.nextInt();
+        String nom = leerString("Ingrese el nombre del Platillo: ");
+        int cantA = leerInt("Cantidad de alergenos (int): ");
 
         if (opcionPla == 2){
             System.out.println("Alergenos Disponibles: ");
@@ -335,7 +348,7 @@ public class EmpleadoConsola {
             int i = 0;
             while(i < cantA){
                 System.out.println("Ingrese una opcion de alergeno: " );
-                int opcionA = sc.nextInt();
+                int opcionA = leerIntRango("Ingrese una opcion de alergeno: ", 1, Alergenos.values().length);
                 Alergenos sel = Alergenos.values()[opcionA - 1];
                 a.add(sel);
                 i += 1;
@@ -343,17 +356,11 @@ public class EmpleadoConsola {
         }
 
         if(opcionPla == 1){
-            System.out.println("¿Es? alcoholica : " );
-            System.out.println("1. SI" );
-            System.out.println("2. NO" );
-            int opcionA = sc.nextInt();
+            int opcionA = leerIntRango("¿Es alcoholica? (1. SI 2. NO): ", 1, 2);
 
             boolean esAlc = (opcionA == 1);
 
-            System.out.println("¿Es una bebida caliente? : " );
-            System.out.println("1. SI" );
-            System.out.println("2. NO" );
-            int opcionC = sc.nextInt();
+            int opcionC = leerIntRango("¿Es una bebida caliente? : (1. SI 2. NO): ", 1, 2);
 
             boolean esCal = (opcionC == 1);
 
@@ -377,8 +384,7 @@ public class EmpleadoConsola {
         ArrayList<DayOfWeek> days = new ArrayList<>();
         System.out.println("--- DATOS PARA EL NUEVO TURNO ---" );
 
-        System.out.println("¿Cuantos dias trabajará?: " );
-        int dias = sc.nextInt();
+        int dias = leerInt("¿Cuantos dias trabajará?: ");
 
         if(dias < 0 || dias > 7){
             throw new MostrarException("Opcion invalida");
@@ -387,10 +393,8 @@ public class EmpleadoConsola {
         int w = 0;
 
         while(w < dias){
-            System.out.println("Ingrese una opcion de dia de la semana: " );
             System.out.println("Dias: 1. Lunes 2. Martes 3. Miercoles 4. Jueves 5. Viernes 6. Sabado 7. Domingo ");
-
-            int opcionD = sc.nextInt();
+            int opcionD = leerIntRango("Ingrese una opcion de dia de la semana: ", 1, 7);
 
             if(opcionD < 1 || opcionD > 7){
                 throw new MostrarException("Opcion invalida");
@@ -400,14 +404,10 @@ public class EmpleadoConsola {
             w += 1;
         }
 
-        System.out.println("Ingrese la hora de inicio de trabajo (hh): " );
-        int horaE = sc.nextInt();
-        System.out.println("Ingrese los minutos de inicio de trabajo (mm): " );
-        int minE = sc.nextInt();
-        System.out.println("Ingrese la hora de fin de trabajo (hh): " );
-        int horaF = sc.nextInt();
-        System.out.println("Ingrese los minutos de fin de trabajo (mm): " );
-        int minF = sc.nextInt();
+        int horaE = leerIntRango("Ingrese la hora de inicio de trabajo (hh): ", 0, 23);
+        int minE = leerIntRango("Ingrese la hora de fin de trabajo (hh): ", 0, 59);
+        int horaF = leerIntRango("Ingrese la hora de fin de trabajo (hh): ", 0, 23);
+        int minF = leerIntRango("Ingrese la hora de fin de trabajo (hh): ", 0, 59);
 
         LocalTime horaEntrada = LocalTime.of(horaE, minE);
         LocalTime horaSalida = LocalTime.of(horaF, minF);
@@ -463,14 +463,10 @@ public class EmpleadoConsola {
         System.out.println("----- CREAR CUENTA EMPLEADO-----");
 
         sc.nextLine();
-        System.out.println("Ingrese su Nombre Completo: ");
-        String nombre = sc.nextLine();
-        System.out.println("Ingrese su Edad: ");
-        int edad = sc.nextInt();
-        System.out.println("Ingrese su Numero de Cedula: ");
-        int cedula = sc.nextInt();
-        System.out.println("¿Cuantos Juegos Favoritos quiere añadir?: ");
-        int cantidadJ = sc.nextInt();
+        String nombre = leerLinea("Ingrese su Nombre Completo:");
+        int edad = leerIntRango("Ingrese su Edad: ", 18, 100);
+        int cedula = leerInt("Ingrese su Numero de Cedula: ");
+        int cantidadJ = leerInt("¿Cuantos Juegos Favoritos quiere añadir?: ");
 
         if (cantidadJ != 0) {
             cafe.mostrarCatalogoJuegos();
@@ -478,8 +474,7 @@ public class EmpleadoConsola {
 
         int i = 0;
         while(i < cantidadJ){
-            System.out.println("Ingrese una opcion: ");
-            int opcion = sc.nextInt();
+            int opcion = leerIntRango("Ingrese una opcion: ", 0, cafe.getCatalogoJuegos().size()-1);
 
             if(opcion < 0 || opcion >= cafe.getCatalogoJuegos().size()){
                 throw new MostrarException("Opcion invalida");
@@ -488,40 +483,32 @@ public class EmpleadoConsola {
             juegos.add(cafe.getCatalogoJuegos().get(opcion));
             i+=1;
         }
-        System.out.println("Ingrese una Contraseña: ");
-        int pass = sc.nextInt();
-        System.out.println("Ingrese un Usuario: ");
-        sc.nextLine();
-        String usu = sc.nextLine();
-        System.out.println("¿Es alergico a algún alimento? (1. SI 2. NO): ");
-        int alergico = sc.nextInt();
+        int pass = leerInt("Ingrese una Contraseña: ");
+        String usu = leerLinea("Ingrese un Usuario: ");
+        int alergico = leerIntRango("¿Es alergico a algún alimento? (1. SI 2. NO): ", 1, 2);
 
         if(alergico != 1 && alergico != 2){
             throw new MostrarException("Opcion invalida");
         }
 
         if(alergico == 1){
-            System.out.println("Cantidad de alergenos (int): " );
-            int cantA = sc.nextInt();
+            int cantA = leerInt("Cantidad de alergenos (int): ");
             System.out.println("Alergenos Disponibles: ");
             for (Alergenos al : Alergenos.values()) {
                 System.out.println(al.ordinal() + 1 + ". " + al.name());
             }
             int in = 0;
             while(in < cantA){
-                System.out.println("Ingrese una opcion de alergeno: " );
-                int opcionA = sc.nextInt();
+                int opcionA = leerIntRango("Ingrese una opcion de alergeno: ", 1, Alergenos.values().length);
                 Alergenos sel = Alergenos.values()[opcionA - 1];
                 a.add(sel);
                 in += 1;
             }
         }
 
-        System.out.println("Ingrese el tipo de empleado (1. Mesero 2. Cocinero): " );
-        int tipo = sc.nextInt();
+        int tipo = leerIntRango("Ingrese el tipo de empleado (1. Mesero 2. Cocinero): ", 1, 2);
 
-        System.out.println("¿Cuantos dias trabajará?: " );
-        int dias = sc.nextInt();
+        int dias = leerInt("¿Cuantos dias trabajará?: ");
 
         if(dias < 0 || dias > 7){
             throw new MostrarException("Opcion invalida");
@@ -530,10 +517,8 @@ public class EmpleadoConsola {
         int w = 0;
 
         while(w < dias){
-            System.out.println("Ingrese una opcion de dia de la semana: " );
             System.out.println("Dias: 1. Lunes 2. Martes 3. Miercoles 4. Jueves 5. Viernes 6. Sabado 7. Domingo ");
-
-            int opcionD = sc.nextInt();
+            int opcionD = leerIntRango("Ingrese una opcion de dia de la semana: ", 1, 7);
 
             if(opcionD < 1 || opcionD > 7){
                 throw new MostrarException("Opcion invalida");
@@ -543,14 +528,10 @@ public class EmpleadoConsola {
             w += 1;
         }
 
-        System.out.println("Ingrese la hora de inicio de trabajo (hh): " );
-        int horaE = sc.nextInt();
-        System.out.println("Ingrese los minutos de inicio de trabajo (mm): " );
-        int minE = sc.nextInt();
-        System.out.println("Ingrese la hora de fin de trabajo (hh): " );
-        int horaF = sc.nextInt();
-        System.out.println("Ingrese los minutos de fin de trabajo (mm): " );
-        int minF = sc.nextInt();
+        int horaE = leerIntRango("Ingrese la hora de inicio de trabajo (hh): ", 0, 23);
+        int minE = leerIntRango("Ingrese los minutos de inicio de trabajo (mm): ", 0, 59);
+        int horaF = leerIntRango("Ingrese la hora de fin de trabajo (hh): ", 0, 23);
+        int minF = leerIntRango("Ingrese los minutos de fin de trabajo (mm): ", 0, 59);
 
         LocalTime horaEntrada = LocalTime.of(horaE, minE);
         LocalTime horaSalida = LocalTime.of(horaF, minF);
@@ -558,14 +539,12 @@ public class EmpleadoConsola {
         Turno turno = new Turno(days, horaEntrada, horaSalida);
 
         if(tipo == 1){
-            System.out.println("¿Cuantos juegos sabe enseñar?");
-            int numJ = sc.nextInt();
+            int numJ = leerInt("¿Cuantos juegos sabe enseñar?");
             if(numJ > 0){
                 cafe.mostrarCatalogoJuegos();
                 int t = 0;
                 while(t < numJ){
-                    System.out.println("Ingrese una opcion: ");
-                    int opcionJ = sc.nextInt();
+                    int opcionJ = leerIntRango("Ingrese una opcion: ", 0, cafe.getCatalogoJuegos().size()-1);
                     if(opcionJ < 0 || opcionJ >= cafe.getCatalogoJuegos().size()){
                         throw new MostrarException("Opcion invalida");
                     }
@@ -600,8 +579,54 @@ public class EmpleadoConsola {
         System.out.println("5. Desinscribirse de Torneo");
         System.out.println("6. Comprar Productos");
         System.out.println("7. Solicitar Intercambio de Turno");
+        System.out.println("8. Solicitar Prestamo");
         System.out.println("0. Salir");
 
+    }
+
+    private static int leerInt(String mensaje) {
+        while (true) {
+            System.out.println(mensaje);
+            try {
+                int valor = sc.nextInt();
+                return valor;
+            } catch (InputMismatchException e) {
+                System.out.println("Entrada inválida. Por favor ingrese un número entero.");
+                sc.next();
+            }
+        }
+    }
+
+    private static int leerIntRango(String mensaje, int min, int max) {
+        while (true) {
+            int valor = leerInt(mensaje);
+            if (valor >= min && valor <= max) {
+                return valor;
+            }
+            System.out.println("Valor fuera de rango. Ingrese un número entre " + min + " y " + max + ".");
+        }
+    }
+
+    private static String leerString(String mensaje) {
+        while (true) {
+            System.out.println(mensaje);
+            String valor = sc.next();
+            if (!valor.isBlank()) {
+                return valor;
+            }
+            System.out.println("Entrada inválida. No puede estar vacío.");
+        }
+    }
+
+    private static String leerLinea(String mensaje) {
+        while (true) {
+            System.out.println(mensaje);
+            String valor = sc.nextLine();
+            if (!valor.isBlank()) {
+                return valor;
+            }
+            System.out.println("Entrada inválida. No puede estar vacío.");
+        }
     }
 
 }
