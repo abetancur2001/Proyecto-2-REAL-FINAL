@@ -6,20 +6,22 @@ import modelo.Café;
 
 public class GestorPersistencia {
 
-    private static final String RUTA = System.getProperty("user.dir") + File.separator + "cafe.dat";
+	private static final String CARPETA = "/Users/andresbetancur/Documents/Proyecto 2 REAL FINAL/Proyecto 2 REAL FINAL/BoardGameCafe/data";
 
-    public void guardarCafe(Café cafe) throws IOException {
-        System.out.println("Ruta: " + RUTA);
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(RUTA))) {
-            out.writeObject(cafe);
-            System.out.println("Guardado en: " + RUTA);
-        }
-    }
+	private static final String RUTA = CARPETA + File.separator + "cafe.dat";
 
-    public Café cargarCafe() throws IOException, ClassNotFoundException {
-        System.out.println("Ruta: " + RUTA);
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(RUTA))) {
-            return (Café) in.readObject();
-        }
-    }
+	public void guardarCafe(Café cafe) throws IOException {
+		System.out.println("Ruta: " + RUTA);
+		try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(RUTA))) {
+			out.writeObject(cafe);
+			System.out.println("Guardado en: " + RUTA);
+		}
+	}
+
+	public Café cargarCafe() throws IOException, ClassNotFoundException {
+		System.out.println("Ruta: " + RUTA);
+		try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(RUTA))) {
+			return (Café) in.readObject();
+		}
+	}
 }
