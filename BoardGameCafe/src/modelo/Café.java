@@ -530,10 +530,6 @@ public class Café implements Serializable{
 		
 		Reserva res = null;
 
-		for (Empleado emp : getEmpleados()) {
-			System.out.println(emp.getNombre() + " dias: " + emp.getTurnoAsignado().getDias());
-		}
-
 		DayOfWeek diaReserva = fechaReserva.getDayOfWeek();
 		
 		if(!hayCapacidad(numPersonas)) {
